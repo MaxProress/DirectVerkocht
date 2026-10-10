@@ -20,9 +20,10 @@ Marktplaats, kringloop en koopjesjagers.
 Plus drie texturen in `assets/img/textures/`:
 
 - **panterprint** en **discoprint** — uit het brandbook geknipt
-- **klatergoud** — uit de aangeleverde hero-foto geknipt en naadloos
-  herhaald, zodat de wordmark levende tekst kan blijven in plaats van
-  een plaatje
+- **rail** en **sliert1-3** — uit de foto van de folieslinger geknipt.
+  De rail hangt bovenaan de hero, de slierten zijn losse linten die bij
+  het openen naar beneden vallen, over de wordmark hangen en voor de
+  cursor wijken.
 
 ## Typografie
 

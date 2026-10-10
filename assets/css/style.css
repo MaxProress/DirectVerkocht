@@ -186,7 +186,7 @@ code {
 
 
 /* --------------------------------------------------------------------------
-   HERO — zwarte wordmark op klatergoud
+   HERO
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -196,7 +196,6 @@ code {
   place-items: center;
   padding: 7rem var(--gutter) 5rem;
   overflow: clip;
-  background: #bdbdbd url("../img/textures/klatergoud.webp") center / cover no-repeat;
 }
 
 .hero__inner {
@@ -243,9 +242,7 @@ code {
   font-family: var(--marker);
   font-size: 0.95rem;
   text-decoration: none;
-  opacity: 0.9;
-  /* Zacht licht randje: houdt het zwart leesbaar op het drukke zilver. */
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 3px rgba(255, 255, 255, 0.9);
+  opacity: 0.75;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -256,6 +253,113 @@ code {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(5px); }
 }
+
+/* --------------------------------------------------------------------------
+   SLINGER
+   Een rail bovenaan met losse slierten die erover hangen. De slierten
+   liggen vóór de wordmark, maar vangen geen klikken: JS luistert op de
+   hero zelf, zodat links eronder gewoon werken.
+   -------------------------------------------------------------------------- */
+
+.slinger {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.slinger__rail {
+  height: clamp(16px, 2.4vw, 28px);
+  background: url("../img/textures/rail.webp") center / 100% 100% no-repeat;
+  /* Onderkant rafelt, zoals bij een echte slinger geknipt is. */
+  clip-path: polygon(
+     0% 0%, 100% 0%, 100% 86%, 96% 100%, 92% 88%, 88% 99%, 84% 87%,
+    80% 100%, 76% 89%, 72% 98%, 68% 86%, 64% 100%, 60% 88%, 56% 97%,
+    52% 87%, 48% 100%, 44% 88%, 40% 98%, 36% 86%, 32% 99%, 28% 89%,
+    24% 100%, 20% 87%, 16% 98%, 12% 88%, 8% 100%, 4% 87%, 0% 97%
+  );
+  transform: translateY(-100%);
+  animation: rail-zakt 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+
+@keyframes rail-zakt {
+  to { transform: translateY(0); }
+}
+
+.sliert {
+  position: absolute;
+  top: clamp(13px, 2.1vw, 25px);
+  left: var(--x);
+  width: var(--w, 22px);
+  height: var(--len);
+  margin-left: calc(var(--w, 22px) / -2);
+
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+
+  /* Licht taps toelopend, met een geknipte punt onderaan. */
+  clip-path: polygon(
+    8% 0%, 92% 0%, 97% 22%, 90% 48%, 96% 72%, 64% 100%, 40% 96%, 8% 74%,
+    3% 46%, 10% 24%
+  );
+
+  transform-origin: 50% 0;
+  /* --val = de inval bij het laden, --duw = de duw van de cursor,
+     --zwaai = het rustige wiegen. JS en CSS schrijven elk hun eigen deel,
+     zodat ze elkaar niet overschrijven. */
+  transform:
+    translateY(var(--val, -102%))
+    rotate(calc(var(--duw, 0deg) + var(--zwaai, 0deg)));
+  will-change: transform;
+}
+
+/* Drie varianten folie. Als klasse en niet als losse url() vanuit JS: een
+   url() in een custom property wordt opgelost vanaf dit bestand, niet vanaf
+   de pagina, en dat levert stil een verkeerd pad op. */
+.sliert--t1 { background-image: url("../img/textures/sliert1.webp"); }
+.sliert--t2 { background-image: url("../img/textures/sliert2.webp"); }
+.sliert--t3 { background-image: url("../img/textures/sliert3.webp"); }
+
+/* De inval. JS zet de vertraging per sliert, zodat ze na elkaar vallen. */
+.slinger.is-los .sliert {
+  animation: sliert-valt 1.05s cubic-bezier(0.34, 1.3, 0.5, 1) var(--vertraging, 0s) forwards;
+}
+
+@keyframes sliert-valt {
+  from { --val: -102%; }
+  to   { --val: 0%; }
+}
+
+/* --val moet een echte, animeerbare eigenschap zijn; anders springt de
+   sliert in één keer in plaats van te vallen. */
+@property --val {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -102%;
+}
+
+@property --duw {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --zwaai {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Rustig wiegen zodra de sliert hangt. */
+.sliert.is-neer {
+  animation: sliert-wiegt var(--tempo, 5s) ease-in-out var(--vertraging, 0s) infinite;
+}
+
+@keyframes sliert-wiegt {
+  0%, 100% { --zwaai: -1.1deg; }
+  50%      { --zwaai: 1.1deg; }
+}
+
 
 /* --- Clusters in de hero -------------------------------------------------- */
 
