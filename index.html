@@ -24,23 +24,38 @@
      ============================================================ -->
 <header class="hero" id="top">
 
-  <!-- Collage-elementen. data-drift = hoe sterk iets meebeweegt bij scrollen. -->
-  <div class="deco-layer" aria-hidden="true">
-    <img class="deco deco--discoball-hand" src="assets/img/elements/2.webp" alt="" data-drift="0.18">
-    <img class="deco deco--discoball-stars" src="assets/img/elements/4.webp" alt="" data-drift="0.3">
-    <img class="deco deco--panterstar"      src="assets/img/elements/14.webp" alt="" data-drift="-0.22">
-    <img class="deco deco--panterblob"      src="assets/img/elements/11.webp" alt="" data-drift="0.12">
-    <img class="deco deco--euro-pink"       src="assets/img/elements/22.webp" alt="" data-drift="-0.3">
-    <img class="deco deco--euro-blue"       src="assets/img/elements/21.webp" alt="" data-drift="0.26">
-    <img class="deco deco--barcode-yellow"  src="assets/img/elements/10.webp" alt="" data-drift="-0.14">
-    <img class="deco deco--sticker-1111"    src="assets/img/elements/5.webp" alt="" data-drift="0.34">
-    <img class="deco deco--cart"            src="assets/img/elements/16.webp" alt="" data-drift="-0.1">
-    <img class="deco deco--flits"           src="assets/img/elements/19.webp" alt="" data-drift="0.2">
-    <img class="deco deco--papierster"      src="assets/img/elements/18.webp" alt="" data-drift="-0.26">
+  <!--
+    Collage-elementen zitten in clusters, net als in het brandbook: een paar
+    groepjes die elkaar overlappen, in plaats van losse stukjes over het hele
+    vlak. data-drift = hoe sterk een cluster meebeweegt bij scrollen.
 
-    <div class="deco patch patch--panter deco--patch-hero-l" data-drift="0.08"></div>
-    <div class="deco patch patch--disco  deco--patch-hero-r" data-drift="-0.16"></div>
-    <img class="deco deco--krant deco--krant-hero" src="assets/img/elements/krant.webp" alt="" data-drift="-0.2">
+    In de hero staat alles op klatergoud, dus hier alleen elementen met een
+    echte vrijstaande rand. De krantensnippers hebben een crèmekleurige
+    achtergrond en zouden hier als blokje zichtbaar worden.
+  -->
+  <div class="deco-layer" aria-hidden="true">
+    <div class="cluster cluster--hero-tl" data-drift="0.16">
+      <img class="deco deco--a" src="assets/img/elements/2.webp" alt="">
+      <img class="deco deco--b" src="assets/img/elements/14.webp" alt="">
+      <img class="deco deco--c" src="assets/img/elements/19.webp" alt="">
+    </div>
+
+    <div class="cluster cluster--hero-tr" data-drift="-0.22">
+      <img class="deco deco--a" src="assets/img/elements/5.webp" alt="">
+      <img class="deco deco--b" src="assets/img/elements/4.webp" alt="">
+      <img class="deco deco--c" src="assets/img/elements/20.webp" alt="">
+    </div>
+
+    <div class="cluster cluster--hero-bl" data-drift="0.24">
+      <img class="deco deco--a" src="assets/img/elements/10.webp" alt="">
+      <img class="deco deco--b" src="assets/img/elements/22.webp" alt="">
+      <img class="deco deco--c" src="assets/img/elements/18.webp" alt="">
+    </div>
+
+    <div class="cluster cluster--hero-br" data-drift="-0.14">
+      <img class="deco deco--a" src="assets/img/elements/16.webp" alt="">
+      <img class="deco deco--b" src="assets/img/elements/11.webp" alt="">
+    </div>
   </div>
 
   <div class="hero__inner">
@@ -83,12 +98,22 @@
        ============================================================ -->
   <section class="section section--show" id="show">
     <div class="deco-layer" aria-hidden="true">
-      <img loading="lazy" decoding="async" class="deco deco--discoball-small" src="assets/img/elements/3.webp" alt="" data-drift="0.22">
-      <img loading="lazy" decoding="async" class="deco deco--pinkstar"        src="assets/img/elements/20.webp" alt="" data-drift="-0.28">
-      <img loading="lazy" decoding="async" class="deco deco--panterstrip"     src="assets/img/elements/12.webp" alt="" data-drift="0.16">
+      <div class="cluster cluster--show-tl" data-drift="0.18">
+        <div class="deco deco--a patch patch--panter"></div>
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/3.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--c" src="assets/img/elements/18.webp" alt="">
+      </div>
 
-      <div class="deco patch patch--panter deco--patch-show" data-drift="0.1"></div>
-      <img loading="lazy" decoding="async" class="deco deco--krant deco--krant-show" src="assets/img/elements/krant.webp" alt="" data-drift="0.24">
+      <div class="cluster cluster--show-tr" data-drift="-0.2">
+        <img loading="lazy" decoding="async" class="deco deco--a" src="assets/img/elements/krant.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/13.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--c" src="assets/img/elements/21.webp" alt="">
+      </div>
+
+      <div class="cluster cluster--show-br" data-drift="0.26">
+        <img loading="lazy" decoding="async" class="deco deco--a" src="assets/img/elements/20.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/12.webp" alt="">
+      </div>
     </div>
 
     <div class="wrap">
@@ -127,12 +152,21 @@
        ============================================================ -->
   <section class="section section--duo" id="wij">
     <div class="deco-layer" aria-hidden="true">
-      <img loading="lazy" decoding="async" class="deco deco--euro-red"    src="assets/img/elements/23.webp" alt="" data-drift="-0.24">
-      <img loading="lazy" decoding="async" class="deco deco--barcode-pink" src="assets/img/elements/8.webp" alt="" data-drift="0.18">
-      <img loading="lazy" decoding="async" class="deco deco--kraft"        src="assets/img/elements/13.webp" alt="" data-drift="-0.12">
+      <div class="cluster cluster--duo-tr" data-drift="-0.18">
+        <div class="deco deco--a patch patch--panter"></div>
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/23.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--c" src="assets/img/elements/19.webp" alt="">
+      </div>
 
-      <div class="deco patch patch--panter deco--patch-duo" data-drift="-0.08"></div>
-      <img loading="lazy" decoding="async" class="deco deco--krant deco--krant-flip deco--krant-duo" src="assets/img/elements/krant.webp" alt="" data-drift="0.2">
+      <div class="cluster cluster--duo-bl" data-drift="0.22">
+        <img loading="lazy" decoding="async" class="deco deco--a" src="assets/img/elements/8.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/17.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--c" src="assets/img/elements/7.webp" alt="">
+      </div>
+
+      <div class="cluster cluster--duo-br" data-drift="0.14">
+        <img loading="lazy" decoding="async" class="deco deco--a deco--krant-flip" src="assets/img/elements/krant.webp" alt="">
+      </div>
     </div>
 
     <div class="wrap wrap--duo">
@@ -162,14 +196,26 @@
        ============================================================ -->
   <section class="section section--contact" id="contact">
     <div class="deco-layer" aria-hidden="true">
-      <img loading="lazy" decoding="async" class="deco deco--discoball-contact" src="assets/img/elements/4.webp" alt="" data-drift="0.2">
-      <img loading="lazy" decoding="async" class="deco deco--cart-draw"         src="assets/img/elements/15.webp" alt="" data-drift="-0.16">
-      <img loading="lazy" decoding="async" class="deco deco--panterblob-2"      src="assets/img/elements/11.webp" alt="" data-drift="0.1">
-      <img loading="lazy" decoding="async" class="deco deco--bon"               src="assets/img/elements/17.webp" alt="" data-drift="-0.22">
+      <div class="cluster cluster--contact-tl" data-drift="0.2">
+        <img loading="lazy" decoding="async" class="deco deco--a" src="assets/img/elements/4.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/22.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--c" src="assets/img/elements/krant.webp" alt="">
+      </div>
 
-      <div class="deco patch patch--disco  deco--patch-contact-l" data-drift="0.12"></div>
-      <div class="deco patch patch--panter deco--patch-contact-r" data-drift="-0.1"></div>
-      <img loading="lazy" decoding="async" class="deco deco--krant deco--krant-contact" src="assets/img/elements/krant.webp" alt="" data-drift="0.18">
+      <div class="cluster cluster--contact-tr" data-drift="-0.16">
+        <div class="deco deco--a patch patch--panter"></div>
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/11.webp" alt="">
+      </div>
+
+      <div class="cluster cluster--contact-bl" data-drift="0.12">
+        <div class="deco deco--a patch patch--disco"></div>
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/9.webp" alt="">
+      </div>
+
+      <div class="cluster cluster--contact-br" data-drift="-0.24">
+        <img loading="lazy" decoding="async" class="deco deco--a" src="assets/img/elements/15.webp" alt="">
+        <img loading="lazy" decoding="async" class="deco deco--b" src="assets/img/elements/6.webp" alt="">
+      </div>
     </div>
 
     <div class="wrap">

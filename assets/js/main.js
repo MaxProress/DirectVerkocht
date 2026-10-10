@@ -35,15 +35,19 @@
      ------------------------------------------------------------------------ */
 
   var teOnthullen = document.querySelectorAll(
-    ".deco, .tape, .videoframe, .photo, .duo-text, .contact__title, .contact__sub, .bigbutton, .socials"
+    ".cluster, .tape, .videoframe, .photo, .duo-text, .contact__title, .contact__sub, .bigbutton, .socials"
   );
 
   teOnthullen.forEach(function (el) {
-    if (!el.classList.contains("deco")) el.classList.add("reveal");
-    // Elke deco krijgt een eigen wiebelduur, anders bewegen ze als één blok.
-    if (el.classList.contains("deco")) {
-      el.style.setProperty("--dur", (6 + Math.random() * 5).toFixed(1) + "s");
-    }
+    // Clusters hebben hun eigen reveal-overgang; de rest leent .reveal.
+    if (!el.classList.contains("cluster")) el.classList.add("reveal");
+  });
+
+  // Elk stukje binnen een cluster wiegt in zijn eigen tempo, anders beweegt
+  // het cluster als één stijf blok.
+  document.querySelectorAll(".cluster .deco").forEach(function (el) {
+    el.style.setProperty("--dur", (6 + Math.random() * 5).toFixed(1) + "s");
+    el.style.animationDelay = "-" + (Math.random() * 5).toFixed(1) + "s";
   });
 
   if ("IntersectionObserver" in window) {
@@ -66,7 +70,7 @@
      3. Collage-elementen laten meedrijven met de scroll
      ------------------------------------------------------------------------ */
 
-  var drijvers = Array.prototype.slice.call(document.querySelectorAll(".deco[data-drift]"));
+  var drijvers = Array.prototype.slice.call(document.querySelectorAll(".cluster[data-drift]"));
   var wachtOpFrame = false;
 
   function verplaatsDeco() {

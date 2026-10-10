@@ -87,8 +87,12 @@ code {
 
 
 /* --------------------------------------------------------------------------
-   Collage-elementen
-   Alles in .deco-layer is decoratief: nooit klikbaar, nooit voorgelezen.
+   Collage
+   Elementen zitten in clusters, zoals in het brandbook: een paar groepjes
+   die elkaar overlappen in plaats van losse stukjes over het hele vlak.
+   Het cluster regelt de plek op de pagina en de scroll-drift; de stukjes
+   erin zijn gepositioneerd in procenten van het cluster, dus een cluster
+   schaalt als geheel mee.
    -------------------------------------------------------------------------- */
 
 .deco-layer {
@@ -99,33 +103,40 @@ code {
   z-index: 1;
 }
 
-.deco {
+.cluster {
   position: absolute;
-  width: var(--w, 120px);
+  width: var(--cw, 260px);
+  aspect-ratio: 1;
   opacity: 0;
-  transform: translate3d(0, 20px, 0) rotate(var(--rot, 0deg));
+  transform: translate3d(0, 26px, 0);
   transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
-.deco.is-in {
+.cluster.is-in {
   opacity: 1;
-  transform: translate3d(0, var(--drift-y, 0px), 0) rotate(var(--rot, 0deg));
+  transform: translate3d(0, var(--drift-y, 0px), 0);
 }
 
-/* De zweefanimatie zit op een wrapper-vrije manier: een losse keyframe die
-   alleen de rotatie licht laat wiegen, zodat de scroll-drift ongemoeid blijft. */
+.cluster .deco {
+  position: absolute;
+  width: var(--w, 50%);
+  rotate: var(--rot, 0deg);
+}
+
+/* Elk stukje wiegt in zijn eigen tempo, anders beweegt een cluster als
+   één stijf blok. De duur zet JS. */
 @keyframes wiebel {
-  0%, 100% { rotate: 0deg; }
-  50%      { rotate: 3deg; }
+  0%, 100% { rotate: var(--rot, 0deg); }
+  50%      { rotate: calc(var(--rot, 0deg) + 3deg); }
 }
 
-.deco.is-in { animation: wiebel var(--dur, 7s) ease-in-out infinite; }
+.cluster.is-in .deco { animation: wiebel var(--dur, 7s) ease-in-out infinite; }
 
 /* Gescheurde vlakken met echte print erin: panter of disco. Geen <img>,
    maar een div, zodat het vlak elke maat en verhouding aankan. */
 .patch {
-  height: var(--h, 200px);
+  height: var(--h, 70%);
   background-size: cover;
   background-position: center;
   clip-path: polygon(
@@ -139,11 +150,8 @@ code {
 .patch--panter { background-image: url("../img/textures/panter.webp"); }
 .patch--disco  { background-image: url("../img/textures/disco.webp"); }
 
-/* Krantensnippers. De tweede is gespiegeld, zodat je niet ziet dat het
-   dezelfde snipper is. */
-.deco--krant { --w: 90px; }
-.deco--krant-flip { --w: 90px; }
-.deco--krant-flip.is-in { scale: -1 1; }
+/* Gespiegelde krantensnipper, zodat je niet ziet dat het dezelfde is. */
+.deco--krant-flip { scale: -1 1; }
 
 
 /* --------------------------------------------------------------------------
@@ -178,7 +186,7 @@ code {
 
 
 /* --------------------------------------------------------------------------
-   HERO
+   HERO — zwarte wordmark op klatergoud
    -------------------------------------------------------------------------- */
 
 .hero {
@@ -188,6 +196,7 @@ code {
   place-items: center;
   padding: 7rem var(--gutter) 5rem;
   overflow: clip;
+  background: #bdbdbd url("../img/textures/klatergoud.webp") center / cover no-repeat;
 }
 
 .hero__inner {
@@ -234,7 +243,9 @@ code {
   font-family: var(--marker);
   font-size: 0.95rem;
   text-decoration: none;
-  opacity: 0.75;
+  opacity: 0.9;
+  /* Zacht licht randje: houdt het zwart leesbaar op het drukke zilver. */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 3px rgba(255, 255, 255, 0.9);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -246,22 +257,26 @@ code {
   50%      { transform: translateY(5px); }
 }
 
-/* Posities van de hero-elementen. --w = breedte, --rot = starthoek. */
-.deco--discoball-hand   { --w: 190px; --rot: -6deg;  top: 6%;  left: 3%; }
-.deco--discoball-stars  { --w: 150px; --rot: 8deg;   top: 12%; right: 5%; }
-.deco--panterstar       { --w: 110px; --rot: -14deg; top: 48%; left: 8%; }
-.deco--panterblob       { --w: 220px; --rot: 5deg;   bottom: 8%; right: 4%; }
-.deco--euro-pink        { --w: 95px;  --rot: 12deg;  bottom: 22%; left: 14%; }
-.deco--euro-blue        { --w: 80px;  --rot: -10deg; top: 24%; right: 20%; }
-.deco--barcode-yellow   { --w: 130px; --rot: -7deg;  bottom: 12%; left: 4%; }
-.deco--sticker-1111     { --w: 125px; --rot: 14deg;  top: 8%;  right: 26%; }
-.deco--cart             { --w: 160px; --rot: -4deg;  bottom: 5%; right: 22%; }
-.deco--flits            { --w: 90px;  --rot: 18deg;  top: 38%; right: 9%; }
-.deco--papierster       { --w: 100px; --rot: -8deg;  top: 62%; right: 14%; }
+/* --- Clusters in de hero -------------------------------------------------- */
 
-.deco--patch-hero-l { --w: 300px; --h: 230px; --rot: -7deg; top: 52%; left: -6%; }
-.deco--patch-hero-r { --w: 260px; --h: 200px; --rot: 6deg;  top: -4%; right: -5%; }
-.deco--krant-hero   { --rot: 9deg;  top: 2%; left: 22%; }
+.cluster--hero-tl { --cw: clamp(190px, 22vw, 320px); top: 1%;  left: -1%; }
+.cluster--hero-tl .deco--a { --w: 62%; --rot: -5deg; top: 0;   left: 10%; }
+.cluster--hero-tl .deco--b { --w: 34%; --rot: -16deg; top: 46%; left: 2%; }
+.cluster--hero-tl .deco--c { --w: 30%; --rot: 14deg;  top: 24%; left: 62%; }
+
+.cluster--hero-tr { --cw: clamp(180px, 21vw, 300px); top: 2%;  right: -1%; }
+.cluster--hero-tr .deco--a { --w: 44%; --rot: 10deg;  top: 2%;  right: 32%; }
+.cluster--hero-tr .deco--b { --w: 54%; --rot: -6deg;  top: 28%; right: 0; }
+.cluster--hero-tr .deco--c { --w: 24%; --rot: 18deg;  top: 0;   right: 6%; }
+
+.cluster--hero-bl { --cw: clamp(170px, 20vw, 280px); bottom: 2%; left: -2%; }
+.cluster--hero-bl .deco--a { --w: 58%; --rot: -8deg; bottom: 0;   left: 0; }
+.cluster--hero-bl .deco--b { --w: 36%; --rot: 12deg; bottom: 30%; left: 36%; }
+.cluster--hero-bl .deco--c { --w: 40%; --rot: -5deg; bottom: 6%;  left: 56%; }
+
+.cluster--hero-br { --cw: clamp(180px, 21vw, 300px); bottom: 0; right: 0; }
+.cluster--hero-br .deco--a { --w: 58%; --rot: 0deg;  bottom: 2%;  right: 4%; }
+.cluster--hero-br .deco--b { --w: 52%; --rot: 7deg;  bottom: 40%; right: 44%; }
 
 
 /* --------------------------------------------------------------------------
@@ -316,12 +331,145 @@ code {
 
 .section--show .wrap { display: grid; justify-items: center; }
 
-.deco--discoball-small { --w: 120px; --rot: 10deg;  top: 8%;  left: 4%; }
-.deco--pinkstar        { --w: 90px;  --rot: -12deg; bottom: 12%; right: 6%; }
-.deco--panterstrip     { --w: 70px;  --rot: 6deg;   top: 40%; right: 3%; }
+.cluster--show-tl { --cw: clamp(180px, 21vw, 290px); top: -3%; left: -4%; }
+.cluster--show-tl .deco--a { --w: 78%; --h: 62%; --rot: -6deg; top: 16%; left: 0; }
+.cluster--show-tl .deco--b { --w: 42%; --rot: 9deg;  top: 0;   left: 50%; }
+.cluster--show-tl .deco--c { --w: 34%; --rot: -12deg; top: 62%; left: 54%; }
 
-.deco--patch-show  { --w: 240px; --h: 190px; --rot: 8deg;   bottom: -4%; left: -5%; }
-.deco--krant-show  { --rot: -11deg; top: 14%; right: -1%; }
+.cluster--show-tr { --cw: clamp(150px, 18vw, 240px); top: 4%; right: -2%; }
+.cluster--show-tr .deco--a { --w: 30%; --rot: -9deg; top: 0;   right: 24%; }
+.cluster--show-tr .deco--b { --w: 18%; --rot: 6deg;  top: 10%; right: 54%; }
+.cluster--show-tr .deco--c { --w: 32%; --rot: 13deg; top: 48%; right: 2%; }
+
+.cluster--show-br { --cw: clamp(150px, 18vw, 240px); bottom: -2%; right: 1%; }
+.cluster--show-br .deco--a { --w: 36%; --rot: -14deg; bottom: 28%; right: 6%; }
+.cluster--show-br .deco--b { --w: 22%; --rot: 8deg;   bottom: 0;   right: 34%; }
+
+
+/* --- Foto + over ons ------------------------------------------------------ */
+
+.wrap--duo {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.cluster--duo-tr { --cw: clamp(180px, 21vw, 300px); top: -5%; right: -5%; }
+.cluster--duo-tr .deco--a { --w: 80%; --h: 60%; --rot: -9deg; top: 10%; right: 0; }
+.cluster--duo-tr .deco--b { --w: 30%; --rot: 14deg;  top: 54%; right: 56%; }
+.cluster--duo-tr .deco--c { --w: 26%; --rot: -18deg; top: 0;   right: 40%; }
+
+.cluster--duo-bl { --cw: clamp(160px, 19vw, 260px); bottom: 0; left: -4%; }
+.cluster--duo-bl .deco--a { --w: 58%; --rot: 8deg;   bottom: 6%;  left: 0; }
+.cluster--duo-bl .deco--b { --w: 34%; --rot: -7deg;  bottom: 34%; left: 44%; }
+.cluster--duo-bl .deco--c { --w: 42%; --rot: 16deg;  bottom: 0;   left: 52%; }
+
+.cluster--duo-br { --cw: clamp(120px, 14vw, 190px); bottom: -4%; right: -2%; }
+.cluster--duo-br .deco--a { --w: 44%; --rot: 7deg; bottom: 0; right: 10%; }
+
+
+/* --- Contact -------------------------------------------------------------- */
+
+.section--contact { text-align: center; padding-bottom: 2rem; }
+
+.cluster--contact-tl { --cw: clamp(170px, 20vw, 280px); top: -1%; left: -6%; }
+.cluster--contact-tl .deco--a { --w: 52%; --rot: -8deg; top: 4%;  left: 0; }
+.cluster--contact-tl .deco--b { --w: 34%; --rot: 12deg; top: 50%; left: 40%; }
+.cluster--contact-tl .deco--c { --w: 24%; --rot: -6deg; top: 0;   left: 58%; }
+
+.cluster--contact-tr { --cw: clamp(170px, 20vw, 280px); top: -8%; right: -7%; }
+.cluster--contact-tr .deco--a { --w: 76%; --h: 58%; --rot: 7deg; top: 8%;  right: 0; }
+.cluster--contact-tr .deco--b { --w: 48%; --rot: -11deg; top: 52%; right: 44%; }
+
+.cluster--contact-bl { --cw: clamp(150px, 18vw, 240px); bottom: 2%; left: -5%; }
+.cluster--contact-bl .deco--a { --w: 72%; --h: 56%; --rot: -6deg; bottom: 4%; left: 0; }
+.cluster--contact-bl .deco--b { --w: 40%; --rot: 10deg;  bottom: 44%; left: 46%; }
+
+.cluster--contact-br { --cw: clamp(160px, 19vw, 260px); bottom: 0; right: -3%; }
+.cluster--contact-br .deco--a { --w: 62%; --rot: 5deg;   bottom: 2%;  right: 2%; }
+.cluster--contact-br .deco--b { --w: 36%; --rot: -13deg; bottom: 44%; right: 52%; }
+
+.contact__title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3rem, 12vw, 8rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  rotate: -1.5deg;
+}
+
+.contact__sub {
+  margin: 1rem auto 2.5rem;
+  max-width: 34ch;
+  font-family: var(--marker);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
+}
+
+.bigbutton {
+  display: inline-block;
+  padding: 0.75em 1.4em;
+  background: var(--roze);
+  color: var(--zwart);
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 0.9rem + 1.4vw, 2.2rem);
+  text-transform: uppercase;
+  text-decoration: none;
+  rotate: -1.5deg;
+  box-shadow: 8px 9px 0 var(--zwart);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.bigbutton:hover,
+.bigbutton:focus-visible {
+  background: var(--geel);
+  transform: translate(3px, 4px);
+  box-shadow: 4px 4px 0 var(--zwart);
+}
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 1.6rem;
+  margin-top: 2.5rem;
+  font-family: var(--display);
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.2rem);
+  text-transform: uppercase;
+}
+
+.socials a {
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.socials a:hover,
+.socials a:focus-visible { border-bottom-color: var(--rood); color: var(--rood); }
+
+.footer {
+  position: relative;
+  z-index: 2;
+  max-width: var(--maxw);
+  margin: 5rem auto 0;
+  padding: 1.5rem var(--gutter);
+  border-top: 3px solid var(--zwart);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.footer a { text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+
+/* --------------------------------------------------------------------------
+   Videoframe
+   -------------------------------------------------------------------------- */
 
 .videoframe {
   position: relative;
@@ -411,21 +559,9 @@ code {
 }
 
 
-/* --- Foto + over ons ------------------------------------------------------ */
-
-.wrap--duo {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: center;
-}
-
-.deco--euro-red     { --w: 85px;  --rot: -14deg; top: 6%;  right: 2%; }
-.deco--barcode-pink { --w: 140px; --rot: 8deg;   bottom: 4%; left: -3%; }
-.deco--kraft        { --w: 60px;  --rot: -5deg;  top: 45%; left: -1%; }
-
-.deco--patch-duo  { --w: 280px; --h: 215px; --rot: -9deg; top: -5%; right: -7%; }
-.deco--krant-duo  { --rot: 7deg; bottom: -2%; right: -1%; }
+/* --------------------------------------------------------------------------
+   Foto
+   -------------------------------------------------------------------------- */
 
 .photo {
   position: relative;
@@ -493,96 +629,6 @@ code {
 }
 
 
-/* --- Contact -------------------------------------------------------------- */
-
-.section--contact { text-align: center; padding-bottom: 2rem; }
-
-.deco--discoball-contact { --w: 130px; --rot: -8deg;  top: 4%;  left: 1%; }
-.deco--cart-draw         { --w: 150px; --rot: 6deg;   bottom: 2%; right: -2%; }
-.deco--panterblob-2      { --w: 170px; --rot: -10deg; top: 24%; right: 1%; }
-.deco--bon               { --w: 100px; --rot: 9deg;   bottom: 6%; left: 2%; }
-
-.deco--patch-contact-l { --w: 230px; --h: 180px; --rot: 7deg;   bottom: 2%; left: -6%; }
-.deco--patch-contact-r { --w: 260px; --h: 200px; --rot: -8deg;  top: -3%; right: -6%; }
-.deco--krant-contact   { --rot: -8deg; top: 42%; left: 3%; }
-
-.contact__title {
-  margin: 0;
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(3rem, 12vw, 8rem);
-  line-height: 0.9;
-  text-transform: uppercase;
-  rotate: -1.5deg;
-}
-
-.contact__sub {
-  margin: 1rem auto 2.5rem;
-  max-width: 34ch;
-  font-family: var(--marker);
-  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
-}
-
-.bigbutton {
-  display: inline-block;
-  padding: 0.75em 1.4em;
-  background: var(--roze);
-  color: var(--zwart);
-  font-family: var(--display);
-  font-size: clamp(1.1rem, 0.9rem + 1.4vw, 2.2rem);
-  text-transform: uppercase;
-  text-decoration: none;
-  rotate: -1.5deg;
-  box-shadow: 8px 9px 0 var(--zwart);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-
-.bigbutton:hover,
-.bigbutton:focus-visible {
-  background: var(--geel);
-  transform: translate(3px, 4px);
-  box-shadow: 4px 4px 0 var(--zwart);
-}
-
-.socials {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem 1.6rem;
-  margin-top: 2.5rem;
-  font-family: var(--display);
-  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.2rem);
-  text-transform: uppercase;
-}
-
-.socials a {
-  text-decoration: none;
-  padding-bottom: 2px;
-  border-bottom: 3px solid transparent;
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.socials a:hover,
-.socials a:focus-visible { border-bottom-color: var(--rood); color: var(--rood); }
-
-.footer {
-  position: relative;
-  z-index: 2;
-  max-width: var(--maxw);
-  margin: 5rem auto 0;
-  padding: 1.5rem var(--gutter);
-  border-top: 3px solid var(--zwart);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-}
-
-.footer a { text-decoration: none; }
-.footer a:hover { text-decoration: underline; }
-
-
 /* --------------------------------------------------------------------------
    Reveal bij scrollen
    -------------------------------------------------------------------------- */
@@ -614,14 +660,9 @@ code {
   .wrap--duo { grid-template-columns: 1fr; }
   .photo { max-width: 460px; margin-inline: auto; }
 
-  /* Minder collage op kleinere schermen, anders wordt het rommelig. */
-  .deco--euro-blue,
-  .deco--flits,
-  .deco--papierster,
-  .deco--cart,
-  .deco--panterblob-2,
-  .deco--kraft,
-  .deco--krant-show { display: none; }
+  /* Clusters die bij één kolom tekst in de weg gaan zitten. */
+  .cluster--duo-br,
+  .cluster--show-tr { display: none; }
 }
 
 
@@ -634,46 +675,26 @@ code {
 
   .hero { padding-top: 5rem; }
 
-  /* Hero-elementen schuiven naar de randen en worden kleiner, zodat de
-     wordmark in het midden leesbaar blijft. */
-  .deco--discoball-hand  { --w: 110px; top: 4%; left: -4%; }
-  .deco--discoball-stars { --w: 95px;  top: 7%; right: -3%; }
-  .deco--panterstar      { --w: 70px;  top: 70%; left: 2%; }
-  .deco--panterblob      { --w: 140px; bottom: 2%; right: -8%; }
-  .deco--euro-pink       { --w: 60px;  bottom: 10%; left: 6%; }
-  .deco--barcode-yellow  { --w: 90px;  bottom: 3%; left: -2%; }
-  .deco--sticker-1111    { --w: 80px;  top: 3%; right: 30%; }
+  /* Clusters schuiven naar de randen en worden kleiner, zodat de wordmark
+     in het midden vrij blijft. */
+  .cluster--hero-tl { --cw: 140px; top: 1%;  left: -6%; }
+  .cluster--hero-tr { --cw: 135px; top: 1%;  right: -6%; }
+  .cluster--hero-bl { --cw: 130px; bottom: 1%; left: -7%; }
+  .cluster--hero-br { --cw: 130px; bottom: 1%; right: -7%; }
 
-  .deco--discoball-small   { --w: 80px; }
-  .deco--pinkstar          { --w: 60px; }
-  .deco--panterstrip       { display: none; }
-  .deco--discoball-contact { --w: 85px; }
-  .deco--cart-draw         { --w: 95px; }
-  .deco--bon               { --w: 70px; }
-  .deco--euro-red          { --w: 60px; }
-  .deco--barcode-pink      { --w: 95px; }
+  .cluster--show-tl    { --cw: 120px; left: -8%; }
+  .cluster--show-br    { --cw: 110px; right: -4%; }
+  .cluster--duo-tr     { --cw: 125px; right: -9%; }
+  .cluster--duo-bl     { --cw: 115px; left: -8%; }
+  .cluster--contact-tl { --cw: 120px; left: -7%; }
+  .cluster--contact-tr { --cw: 125px; right: -9%; }
+  .cluster--contact-bl { --cw: 110px; left: -9%; }
+  .cluster--contact-br { --cw: 115px; right: -7%; }
 
   .videoframe__price { width: 92px; bottom: -32px; left: -14px; }
   .videoframe__tape  { width: 80px; height: 26px; }
 
   .photo__star { width: 74px; top: -28px; right: -16px; }
-
-  /* De gescheurde vlakken blijven, maar kleiner en verder naar de rand,
-     anders lopen ze onder de tekst door. */
-  .deco--patch-hero-l    { --w: 170px; --h: 130px; top: 58%; left: -12%; }
-  .deco--patch-hero-r    { --w: 150px; --h: 115px; top: -2%; right: -12%; }
-  .deco--patch-show      { --w: 140px; --h: 110px; left: -12%; }
-  .deco--patch-duo       { --w: 160px; --h: 125px; right: -14%; }
-  .deco--patch-contact-l { --w: 130px; --h: 100px; left: -12%; }
-  .deco--patch-contact-r { --w: 150px; --h: 115px; right: -14%; }
-
-  /* Valt op mobiel boven op het grote panter-vlak; er is al genoeg panter. */
-  .deco--panterstar { display: none; }
-
-  .deco--krant { --w: 58px; }
-  .deco--krant-hero    { top: 1%; left: 30%; }
-  .deco--krant-contact { top: 48%; left: -2%; }
-  .deco--krant-duo     { display: none; }
 
   .footer { justify-content: center; text-align: center; }
 }
@@ -692,6 +713,6 @@ code {
     transition-duration: 0.001ms !important;
   }
 
-  .deco, .reveal { opacity: 1; transform: none; }
+  .cluster, .reveal { opacity: 1; transform: none; }
   .ticker__track { animation: none; }
 }

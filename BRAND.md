@@ -17,7 +17,12 @@ Marktplaats, kringloop en koopjesjagers.
 | `--zwart` | `#111111` | tekst, logo |
 | `--creme` | `#F7F2E9` | achtergrond |
 
-Plus twee patronen: **panterprint** en **discoprint** (zilveren spiegeltegels).
+Plus drie texturen in `assets/img/textures/`:
+
+- **panterprint** en **discoprint** — uit het brandbook geknipt
+- **klatergoud** — uit de aangeleverde hero-foto geknipt en naadloos
+  herhaald, zodat de wordmark levende tekst kan blijven in plaats van
+  een plaatje
 
 ## Typografie
 
@@ -45,4 +50,4 @@ Plus twee patronen: **panterprint** en **discoprint** (zilveren spiegeltegels).
 | 9 | barcode zwart op wit | 21 | euroteken blauw |
 | 10 | barcode geel | 22 | euroteken roze |
 | 11 | panterprint verfvlek | 23 | euroteken rood |
-| 12 | panterprint strook | | |
+| 12 | panterprint strook | – | krant: gescheurde krantensnipper |
