@@ -112,15 +112,47 @@
   var slingers = Array.prototype.slice.call(document.querySelectorAll(".slinger"));
 
   if (slingers.length) {
-    var slierten = Array.prototype.slice.call(document.querySelectorAll(".sliert"));
     var hero = document.querySelector(".hero");
 
-    var SCHARNIEREN = 5;
+    // Vaste "toevalsgetallen": elke herlaadbeurt hangt het gordijn er
+    // hetzelfde bij, wat bij het bijstellen een stuk prettiger werkt.
+    var zaad = 20260110;
+    function kans() {
+      zaad = (zaad * 1664525 + 1013904223) % 4294967296;
+      return zaad / 4294967296;
+    }
+
+    // Een dichte laag zetten we niet met de hand in de opmaak: data-aantal
+    // op de slinger zegt hoeveel slierten er moeten komen.
+    slingers.forEach(function (laag) {
+      var aantal = parseInt(laag.dataset.aantal, 10);
+      if (!aantal) return;
+
+      var kort = parseFloat(laag.dataset.kort) || 70;
+      var lang = parseFloat(laag.dataset.lang) || 95;
+
+      for (var k = 0; k < aantal; k++) {
+        var el = document.createElement("span");
+        el.className = "sliert";
+        // Gelijkmatig verdeeld, maar net niet op een rij.
+        el.dataset.x = (-2 + (104 / (aantal - 1)) * k + (kans() - 0.5) * 2.6).toFixed(1);
+        el.dataset.len = (kort + kans() * (lang - kort)).toFixed(0);
+        el.dataset.tex = String(1 + Math.floor(kans() * 3));
+        laag.appendChild(el);
+      }
+    });
+
+    var slierten = Array.prototype.slice.call(document.querySelectorAll(".sliert"));
 
     slierten.forEach(function (el, i) {
       var x   = parseFloat(el.dataset.x) || 50;
       var len = parseFloat(el.dataset.len) || 45;
       var tex = el.dataset.tex || "1";
+
+      // De achterste laag zit grotendeels achter de wordmark, dus daar zijn
+      // drie scharnieren genoeg. Dat scheelt flink wat rekenwerk bij een
+      // dicht gordijn; vooraan blijven het er vijf voor een vloeiende bocht.
+      var scharnieren = el.closest(".slinger--achter") ? 3 : 5;
 
       el.style.setProperty("--x", x + "%");
       el.style.setProperty("--len", len + "svh");
@@ -128,20 +160,33 @@
       el.classList.add("sliert--t" + tex);
       el.style.setProperty("--tempo", (4.6 + ((i * 37) % 11) * 0.48).toFixed(2) + "s");
       el.style.setProperty("--fase", (-((i * 61) % 13) * 0.41).toFixed(2) + "s");
-      // Niet allemaal tegelijk: van links naar rechts, met wat ruis erin.
-      el.style.setProperty("--vertraging", (0.15 + i * 0.045 + (i % 3) * 0.03).toFixed(2) + "s");
+      // Niet allemaal tegelijk, maar ook niet keurig van links naar rechts.
+      el.style.setProperty("--vertraging", (0.12 + ((i * 29) % 23) * 0.055).toFixed(2) + "s");
       // Niemand hangt kaarsrecht.
       el.style.setProperty("--kantel", (((i * 53) % 7) - 3) * 0.8 + "deg");
 
-      // De drie in elkaar hangende delen. Staan hier en niet in de opmaak,
-      // want het is puur versiering en het scheelt negen keer dezelfde
+      // De in elkaar hangende delen. Staan hier en niet in de opmaak, want
+      // het is puur versiering en het scheelt tientallen keren dezelfde
       // nesting in index.html.
       var binnenste = el;
-      for (var n = 1; n <= SCHARNIEREN; n++) {
+      for (var n = 1; n <= scharnieren; n++) {
+        var diep = (n - 1) / (scharnieren - 1);   // 0 bovenaan, 1 bij de punt
+
         var deel = document.createElement("i");
-        deel.className = "deel deel--" + n;
+        deel.className = "deel deel--" + n + (n === scharnieren ? " deel--eind" : "");
+        if (n === 1) deel.style.height = (100 / scharnieren).toFixed(2) + "%";
+        // Dieper = grotere slag en meer achterloop, zodat de beweging als
+        // een golf naar de punt loopt.
+        deel.style.setProperty("--slag", (2.8 + diep * 5.0).toFixed(2) + "deg");
+        deel.style.animationDelay =
+          "calc(var(--fase, 0s) + var(--tempo, 5s) * " + (-0.24 * diep).toFixed(3) + ")";
+
         var blad = document.createElement("i");
         blad.className = "blad";
+        // Dezelfde foto verdeeld over de delen.
+        blad.style.setProperty("--rek", scharnieren * 100 + "%");
+        blad.style.setProperty("--plek", (diep * 100).toFixed(1) + "%");
+
         deel.appendChild(blad);
         binnenste.appendChild(deel);
         binnenste = deel;
@@ -172,17 +217,23 @@
       // Per sliert één veertje per scharnier. Het bovenste volgt de cursor,
       // de onderste volgen het scharnier erboven met een slag vertraging —
       // zo krult de sliert na in plaats van als één plank te kantelen.
+      // Stijfheid en demping hangen af van hoe diep een scharnier zit, niet
+      // van een vaste lijst: zo werkt het voor drie én voor vijf scharnieren.
+      var DOORGIFTE = 0.86;
+
       var veren = slierten.map(function (el) {
+        var delen = Array.prototype.slice.call(el.querySelectorAll(".deel"));
+        var laatste = delen.length - 1;
+
         return {
-          delen: Array.prototype.slice.call(el.querySelectorAll(".deel")),
-          hoek: [0, 0, 0, 0, 0],
-          snelheid: [0, 0, 0, 0, 0]
+          delen: delen,
+          hoek: delen.map(function () { return 0; }),
+          snelheid: delen.map(function () { return 0; }),
+          stijfheid: delen.map(function (_, n) { return 0.075 - 0.043 * (n / laatste); }),
+          demping: delen.map(function (_, n) { return 0.925 + 0.035 * (n / laatste); }),
+          zwiep: delen.map(function (_, n) { return 4 + 9 * (n / laatste); })
         };
       });
-
-      var STIJFHEID = [0.075, 0.062, 0.050, 0.040, 0.032];
-      var DEMPING   = [0.925, 0.935, 0.945, 0.952, 0.960];
-      var DOORGIFTE = 0.86;
 
       var muisX = null, loopt = false;
 
@@ -215,8 +266,7 @@
           var kracht = (1 - Math.abs(afstand) / bereik) * (afstand >= 0 ? 1 : -1);
           // Het uiteinde krijgt de hardste zwieper.
           for (var k = 0; k < v.snelheid.length; k++) {
-            // Het uiteinde krijgt de hardste zwieper.
-            v.snelheid[k] += kracht * (4 + k * 2.6);
+            v.snelheid[k] += kracht * v.zwiep[k];
           }
         });
         start();
@@ -241,8 +291,8 @@
           for (var n = 0; n < v.hoek.length; n++) {
             var doel = n === 0 ? kop : v.hoek[n - 1] * DOORGIFTE;
 
-            v.snelheid[n] += (doel - v.hoek[n]) * STIJFHEID[n];
-            v.snelheid[n] *= DEMPING[n];
+            v.snelheid[n] += (doel - v.hoek[n]) * v.stijfheid[n];
+            v.snelheid[n] *= v.demping[n];
             v.hoek[n] += v.snelheid[n];
 
             if (Math.abs(v.snelheid[n]) > 0.01 || Math.abs(v.hoek[n] - doel) > 0.01) {

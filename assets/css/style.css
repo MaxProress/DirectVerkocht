@@ -326,30 +326,26 @@ code {
   rotate: calc(var(--duw, 0deg) + var(--zwaai, 0deg));
 }
 
-/* Vijf delen: genoeg om de bocht vloeiend te laten lopen. Met drie zag je
-   de knik op elk scharnier zitten. */
-.deel--1 { top: 0; height: 20%; }
+/* Het bovenste deel. Zijn hoogte hangt af van het aantal scharnieren en
+   wordt door JS gezet. */
+.deel--1 { top: 0; }
 
 .blad {
   position: absolute;
   inset: 0;
   /* Horizontaal inzoomen op het midden van de uitsnede: zo vult één sliert
-     het lint, in plaats van een plakje gordijn met gaten ertussen. */
-  background-size: 300% 500%;
+     het lint, in plaats van een plakje gordijn met gaten ertussen.
+     --rek en --plek verdelen dezelfde foto over de delen, zodat de folie
+     over de hele sliert doorloopt; JS rekent ze uit. */
+  background-size: 300% var(--rek, 500%);
+  background-position: 50% var(--plek, 0%);
   background-repeat: no-repeat;
   /* Rechte zijkanten — een lint, geen ijspegel. */
   clip-path: polygon(9% 0%, 91% 0%, 91% 100%, 9% 100%);
 }
 
-/* Elk deel toont zijn eigen stuk van dezelfde foto, zodat de folie over de
-   hele sliert doorloopt. */
-.deel--1 > .blad { background-position: 50% 0%; }
-.deel--2 > .blad { background-position: 50% 25%; }
-.deel--3 > .blad { background-position: 50% 50%; }
-.deel--4 > .blad { background-position: 50% 75%; }
-.deel--5 > .blad {
-  background-position: 50% 100%;
-  /* Bot afgeknipt uiteinde, licht scheef. */
+/* Bot afgeknipt uiteinde, licht scheef. */
+.deel--eind > .blad {
   clip-path: polygon(9% 0%, 91% 0%, 88% 82%, 54% 100%, 14% 88%);
 }
 
@@ -395,15 +391,11 @@ code {
   duur maar met een versprongen fase, dus de beweging loopt als een golf
   naar beneden en het uiteinde zwaait het verst.
 */
+/* --slag en de vertraging per deel zet JS: die hangen af van hoe diep het
+   deel zit en van hoeveel scharnieren de sliert heeft. */
 .sliert.is-neer .deel {
   animation: slingert var(--tempo, 5s) ease-in-out infinite;
 }
-
-.sliert.is-neer .deel--1 { --slag: 2.8deg; animation-delay: var(--fase, 0s); }
-.sliert.is-neer .deel--2 { --slag: 3.9deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.06); }
-.sliert.is-neer .deel--3 { --slag: 5.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.12); }
-.sliert.is-neer .deel--4 { --slag: 6.4deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.18); }
-.sliert.is-neer .deel--5 { --slag: 7.8deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.24); }
 
 @keyframes slingert {
   0%, 100% { --zwaai: calc(var(--slag) * -1); }
@@ -847,8 +839,8 @@ code {
 
   /* Op een telefoon blijven er zeven over, en smaller: twintig slierten
      verstoppen de wordmark, en honderd delen animeren is zonde van de accu. */
-  .slinger--achter .sliert:not(:nth-of-type(4n + 2)),
-  .slinger--voor .sliert:not(:nth-of-type(4n + 1)) { display: none; }
+  .slinger--achter .sliert:not(:nth-of-type(5n + 3)),
+  .slinger--voor .sliert:not(:nth-of-type(2n + 1)) { display: none; }
 
   .sliert { --wf: 0.68; }
 
