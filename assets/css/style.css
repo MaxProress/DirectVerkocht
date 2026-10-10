@@ -399,11 +399,11 @@ code {
   animation: slingert var(--tempo, 5s) ease-in-out infinite;
 }
 
-.sliert.is-neer .deel--1 { --slag: 2.2deg; animation-delay: var(--fase, 0s); }
-.sliert.is-neer .deel--2 { --slag: 3.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.05); }
-.sliert.is-neer .deel--3 { --slag: 4.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.10); }
-.sliert.is-neer .deel--4 { --slag: 5.2deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.15); }
-.sliert.is-neer .deel--5 { --slag: 6.4deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.20); }
+.sliert.is-neer .deel--1 { --slag: 2.8deg; animation-delay: var(--fase, 0s); }
+.sliert.is-neer .deel--2 { --slag: 3.9deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.06); }
+.sliert.is-neer .deel--3 { --slag: 5.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.12); }
+.sliert.is-neer .deel--4 { --slag: 6.4deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.18); }
+.sliert.is-neer .deel--5 { --slag: 7.8deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.24); }
 
 @keyframes slingert {
   0%, 100% { --zwaai: calc(var(--slag) * -1); }
@@ -847,8 +847,8 @@ code {
 
   /* Op een telefoon blijven er zeven over, en smaller: twintig slierten
      verstoppen de wordmark, en honderd delen animeren is zonde van de accu. */
-  .slinger--achter .sliert:not(:nth-of-type(3n + 2)),
-  .slinger--voor .sliert:not(:nth-of-type(3n + 1)) { display: none; }
+  .slinger--achter .sliert:not(:nth-of-type(4n + 2)),
+  .slinger--voor .sliert:not(:nth-of-type(4n + 1)) { display: none; }
 
   .sliert { --wf: 0.68; }
 
