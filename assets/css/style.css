@@ -286,6 +286,16 @@ code {
   to { transform: translateY(0); }
 }
 
+/*
+  Een sliert is geen stijve staaf. Hij bestaat uit drie delen die in elkaar
+  hangen: deel 2 hangt aan deel 1, deel 3 aan deel 2. Elk deel draait om zijn
+  eigen bovenkant, dus een beweging bovenin plant zich naar beneden voort en
+  de sliert krult mee in plaats van als geheel te kantelen.
+
+  Het zichtbare lint zit in een .blad bínnen elk deel. Een clip-path op het
+  deel zelf zou de onderliggende delen wegknippen, want die zijn kinderen.
+*/
+
 .sliert {
   position: absolute;
   top: clamp(13px, 2.1vw, 25px);
@@ -293,32 +303,57 @@ code {
   width: var(--w, 22px);
   height: var(--len);
   margin-left: calc(var(--w, 22px) / -2);
-
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-
-  /* Licht taps toelopend, met een geknipte punt onderaan. */
-  clip-path: polygon(
-    8% 0%, 92% 0%, 97% 22%, 90% 48%, 96% 72%, 64% 100%, 40% 96%, 8% 74%,
-    3% 46%, 10% 24%
-  );
-
   transform-origin: 50% 0;
-  /* --val = de inval bij het laden, --duw = de duw van de cursor,
-     --zwaai = het rustige wiegen. JS en CSS schrijven elk hun eigen deel,
-     zodat ze elkaar niet overschrijven. */
-  transform:
-    translateY(var(--val, -102%))
-    rotate(calc(var(--duw, 0deg) + var(--zwaai, 0deg)));
+  /* --val = de inval bij het laden, --kantel = de scheefstand waarmee hij
+     hangt, zodat ze niet allemaal kaarsrecht naar beneden wijzen. */
+  transform: translateY(var(--val, -102%)) rotate(var(--kantel, 0deg));
   will-change: transform;
+}
+
+.deel {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 0;
+  /* --duw komt van de cursor (JS), --zwaai van het rustige wiegen (CSS). */
+  rotate: calc(var(--duw, 0deg) + var(--zwaai, 0deg));
+}
+
+/* Vijf delen: genoeg om de bocht vloeiend te laten lopen. Met drie zag je
+   de knik op elk scharnier zitten. */
+.deel--1 { top: 0; height: 20%; }
+
+.blad {
+  position: absolute;
+  inset: 0;
+  /* Horizontaal inzoomen op het midden van de uitsnede: zo vult één sliert
+     het lint, in plaats van een plakje gordijn met gaten ertussen. */
+  background-size: 300% 500%;
+  background-repeat: no-repeat;
+  /* Rechte zijkanten — een lint, geen ijspegel. */
+  clip-path: polygon(9% 0%, 91% 0%, 91% 100%, 9% 100%);
+}
+
+/* Elk deel toont zijn eigen stuk van dezelfde foto, zodat de folie over de
+   hele sliert doorloopt. */
+.deel--1 > .blad { background-position: 50% 0%; }
+.deel--2 > .blad { background-position: 50% 25%; }
+.deel--3 > .blad { background-position: 50% 50%; }
+.deel--4 > .blad { background-position: 50% 75%; }
+.deel--5 > .blad {
+  background-position: 50% 100%;
+  /* Bot afgeknipt uiteinde, licht scheef. */
+  clip-path: polygon(9% 0%, 91% 0%, 88% 82%, 54% 100%, 14% 88%);
 }
 
 /* Drie varianten folie. Als klasse en niet als losse url() vanuit JS: een
    url() in een custom property wordt opgelost vanaf dit bestand, niet vanaf
    de pagina, en dat levert stil een verkeerd pad op. */
-.sliert--t1 { background-image: url("../img/textures/sliert1.webp"); }
-.sliert--t2 { background-image: url("../img/textures/sliert2.webp"); }
-.sliert--t3 { background-image: url("../img/textures/sliert3.webp"); }
+.sliert--t1 .blad { background-image: url("../img/textures/sliert1.webp"); }
+.sliert--t2 .blad { background-image: url("../img/textures/sliert2.webp"); }
+.sliert--t3 .blad { background-image: url("../img/textures/sliert3.webp"); }
 
 /* De inval. JS zet de vertraging per sliert, zodat ze na elkaar vallen. */
 .slinger.is-los .sliert {
@@ -350,14 +385,24 @@ code {
   initial-value: 0deg;
 }
 
-/* Rustig wiegen zodra de sliert hangt. */
-.sliert.is-neer {
-  animation: sliert-wiegt var(--tempo, 5s) ease-in-out var(--vertraging, 0s) infinite;
+/*
+  Rustig slingeren zodra de sliert hangt. De drie delen lopen op dezelfde
+  duur maar met een versprongen fase, dus de beweging loopt als een golf
+  naar beneden en het uiteinde zwaait het verst.
+*/
+.sliert.is-neer .deel {
+  animation: slingert var(--tempo, 5s) ease-in-out infinite;
 }
 
-@keyframes sliert-wiegt {
-  0%, 100% { --zwaai: -1.1deg; }
-  50%      { --zwaai: 1.1deg; }
+.sliert.is-neer .deel--1 { --slag: 1.4deg; animation-delay: 0s; }
+.sliert.is-neer .deel--2 { --slag: 1.9deg; animation-delay: calc(var(--tempo, 5s) * -0.05); }
+.sliert.is-neer .deel--3 { --slag: 2.4deg; animation-delay: calc(var(--tempo, 5s) * -0.10); }
+.sliert.is-neer .deel--4 { --slag: 3.0deg; animation-delay: calc(var(--tempo, 5s) * -0.15); }
+.sliert.is-neer .deel--5 { --slag: 3.7deg; animation-delay: calc(var(--tempo, 5s) * -0.20); }
+
+@keyframes slingert {
+  0%, 100% { --zwaai: calc(var(--slag) * -1); }
+  50%      { --zwaai: var(--slag); }
 }
 
 

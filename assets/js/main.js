@@ -115,6 +115,8 @@
     var slierten = Array.prototype.slice.call(slinger.querySelectorAll(".sliert"));
     var hero = document.querySelector(".hero");
 
+    var SCHARNIEREN = 5;
+
     slierten.forEach(function (el, i) {
       var x   = parseFloat(el.dataset.x) || 50;
       var len = parseFloat(el.dataset.len) || 45;
@@ -127,9 +129,25 @@
       el.style.setProperty("--tempo", (4.2 + (i % 5) * 0.7).toFixed(1) + "s");
       // Niet allemaal tegelijk: van links naar rechts, met wat ruis erin.
       el.style.setProperty("--vertraging", (0.15 + i * 0.045 + (i % 3) * 0.03).toFixed(2) + "s");
+      // Niemand hangt kaarsrecht.
+      el.style.setProperty("--kantel", (((i * 53) % 7) - 3) * 0.8 + "deg");
 
-      // Zodra de val klaar is de eindstand vastzetten, want de wieg-animatie
-      // vervangt de val-animatie en zou --val anders terugzetten.
+      // De drie in elkaar hangende delen. Staan hier en niet in de opmaak,
+      // want het is puur versiering en het scheelt negen keer dezelfde
+      // nesting in index.html.
+      var binnenste = el;
+      for (var n = 1; n <= SCHARNIEREN; n++) {
+        var deel = document.createElement("i");
+        deel.className = "deel deel--" + n;
+        var blad = document.createElement("i");
+        blad.className = "blad";
+        deel.appendChild(blad);
+        binnenste.appendChild(deel);
+        binnenste = deel;
+      }
+
+      // Zodra de val klaar is de eindstand vastzetten: de val-animatie zit
+      // op de sliert en zou bij het aflopen terugspringen.
       el.addEventListener("animationend", function bij(e) {
         if (e.animationName !== "sliert-valt") return;
         el.removeEventListener("animationend", bij);
@@ -148,9 +166,20 @@
         requestAnimationFrame(function () { slinger.classList.add("is-los"); });
       });
 
+      // Per sliert één veertje per scharnier. Het bovenste volgt de cursor,
+      // de onderste volgen het scharnier erboven met een slag vertraging —
+      // zo krult de sliert na in plaats van als één plank te kantelen.
       var veren = slierten.map(function (el) {
-        return { el: el, hoek: 0, snelheid: 0, doel: 0 };
+        return {
+          delen: Array.prototype.slice.call(el.querySelectorAll(".deel")),
+          hoek: [0, 0, 0, 0, 0],
+          snelheid: [0, 0, 0, 0, 0]
+        };
       });
+
+      var STIJFHEID = [0.15, 0.13, 0.115, 0.10, 0.085];
+      var DEMPING   = [0.86, 0.87, 0.88, 0.89, 0.90];
+      var DOORGIFTE = 0.72;
 
       var muisX = null, loopt = false;
 
@@ -178,10 +207,14 @@
         var x = e.clientX;
         veren.forEach(function (v, i) {
           var afstand = middens[i] - x;
-          var bereik = 260;
+          var bereik = 300;
           if (Math.abs(afstand) > bereik) return;
-          var kracht = (1 - Math.abs(afstand) / bereik);
-          v.snelheid += (afstand >= 0 ? 1 : -1) * kracht * 9;
+          var kracht = (1 - Math.abs(afstand) / bereik) * (afstand >= 0 ? 1 : -1);
+          // Het uiteinde krijgt de hardste zwieper.
+          for (var k = 0; k < v.snelheid.length; k++) {
+            // Het uiteinde krijgt de hardste zwieper.
+            v.snelheid[k] += kracht * (4 + k * 2.6);
+          }
         });
         start();
       });
@@ -190,27 +223,31 @@
         var rust = true;
 
         veren.forEach(function (v, i) {
-          if (muisX === null) {
-            v.doel = 0;
-          } else {
+          var kop = 0;
+
+          if (muisX !== null) {
             var afstand = middens[i] - muisX;
-            var bereik = 220;
-            if (Math.abs(afstand) > bereik) {
-              v.doel = 0;
-            } else {
+            var bereik = 240;
+            if (Math.abs(afstand) <= bereik) {
               // Dichterbij = verder opzij, en altijd wég van de cursor.
               var kracht = 1 - Math.abs(afstand) / bereik;
-              v.doel = (afstand >= 0 ? 1 : -1) * kracht * 14;
+              kop = (afstand >= 0 ? 1 : -1) * kracht * 7;
             }
           }
 
-          v.snelheid += (v.doel - v.hoek) * 0.11;
-          v.snelheid *= 0.87;
-          v.hoek += v.snelheid;
+          for (var n = 0; n < v.hoek.length; n++) {
+            var doel = n === 0 ? kop : v.hoek[n - 1] * DOORGIFTE;
 
-          if (Math.abs(v.snelheid) > 0.01 || Math.abs(v.hoek - v.doel) > 0.01) rust = false;
+            v.snelheid[n] += (doel - v.hoek[n]) * STIJFHEID[n];
+            v.snelheid[n] *= DEMPING[n];
+            v.hoek[n] += v.snelheid[n];
 
-          v.el.style.setProperty("--duw", v.hoek.toFixed(2) + "deg");
+            if (Math.abs(v.snelheid[n]) > 0.01 || Math.abs(v.hoek[n] - doel) > 0.01) {
+              rust = false;
+            }
+
+            v.delen[n].style.setProperty("--duw", v.hoek[n].toFixed(2) + "deg");
+          }
         });
 
         // Stoppen zodra alles stilhangt, ook als de muis nog op de hero
