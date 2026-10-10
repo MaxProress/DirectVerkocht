@@ -1,39 +1,626 @@
-/* Design volgt later — dit is alleen een werkende basis. */
+/* ==========================================================================
+   DIRECT VERKOCHT — Classy Trashy
+   Plain CSS, geen build step. Kleuren en maten staan als tokens bovenaan.
+   ========================================================================== */
+
+/* Chunko Bold — LET OP: dit is de demo-versie, alleen voor persoonlijk
+   gebruik. Vervang het bestand door de gekochte versie voordat de site
+   live gaat. Zie BRAND.md. */
+@font-face {
+  font-family: "Chunko";
+  src: url("../fonts/chunko-bold-demo.otf") format("opentype"),
+       url("../fonts/chunko-bold-demo.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
-  --bg: #0e0e0e;
-  --fg: #f5f5f0;
+  --rood:   #ff3131;
+  --roze:   #ff3ca6;
+  --geel:   #ffec00;
+  --blauw:  #1769ff;
+  --zwart:  #111111;
+  --creme:  #f7f2e9;
+
+  --display: "Chunko", "Arial Black", sans-serif;
+  --marker:  "Permanent Marker", "Comic Sans MS", cursive;
+  --body:    "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --gutter: 24px;
+  --maxw: 1200px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body { margin: 0; height: 100%; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  background: var(--creme);
+  color: var(--zwart);
+  font-family: var(--body);
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.65;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
-.placeholder {
-  min-height: 100%;
+img { display: block; max-width: 100%; height: auto; }
+
+a { color: inherit; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  background: rgba(17, 17, 17, 0.07);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  position: relative;
+  z-index: 2;
+}
+
+
+/* --------------------------------------------------------------------------
+   Collage-elementen
+   Alles in .deco-layer is decoratief: nooit klikbaar, nooit voorgelezen.
+   -------------------------------------------------------------------------- */
+
+.deco-layer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.deco {
+  position: absolute;
+  width: var(--w, 120px);
+  opacity: 0;
+  transform: translate3d(0, 20px, 0) rotate(var(--rot, 0deg));
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.deco.is-in {
+  opacity: 1;
+  transform: translate3d(0, var(--drift-y, 0px), 0) rotate(var(--rot, 0deg));
+}
+
+/* De zweefanimatie zit op een wrapper-vrije manier: een losse keyframe die
+   alleen de rotatie licht laat wiegen, zodat de scroll-drift ongemoeid blijft. */
+@keyframes wiebel {
+  0%, 100% { rotate: 0deg; }
+  50%      { rotate: 3deg; }
+}
+
+.deco.is-in { animation: wiebel var(--dur, 7s) ease-in-out infinite; }
+
+
+/* --------------------------------------------------------------------------
+   Tape-labels
+   -------------------------------------------------------------------------- */
+
+.tape {
+  display: inline-block;
+  margin: 0;
+  padding: 0.45em 1.1em 0.5em;
+  background: var(--geel);
+  font-family: var(--display);
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  rotate: -2.2deg;
+  /* Gescheurde randen links en rechts. */
+  clip-path: polygon(
+    0% 8%, 2% 0%, 98% 4%, 100% 0%, 100% 92%, 98% 100%, 2% 96%, 0% 100%
+  );
+}
+
+.tape--heading { margin-bottom: 1.6rem; }
+
+.tape--tagline {
+  font-family: var(--marker);
+  font-size: clamp(1rem, 0.85rem + 0.9vw, 1.5rem);
+  text-transform: none;
+  rotate: 1.8deg;
+}
+
+
+/* --------------------------------------------------------------------------
+   HERO
+   -------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 7rem var(--gutter) 5rem;
+  overflow: clip;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 1.8rem;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 0.82;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: clamp(3.6rem, 15vw, 11rem);
+  display: grid;
+}
+
+.wordmark__line { display: block; }
+.wordmark__line--1 { rotate: -2.5deg; }
+.wordmark__line--2 { rotate: 1.5deg; margin-top: -0.04em; }
+
+/* Elke letter krijgt in JS een eigen span zodat ze los kunnen wiebelen. */
+.wordmark .ltr {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease;
+}
+
+.wordmark .ltr:hover {
+  transform: translateY(-0.07em) rotate(-6deg) scale(1.06);
+  color: var(--roze);
+}
+
+.scroll-hint {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 1rem;
+  font-family: var(--marker);
+  font-size: 0.95rem;
+  text-decoration: none;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.scroll-hint:hover { opacity: 1; transform: translateY(3px); }
+.scroll-hint svg { animation: wip 2.2s ease-in-out infinite; }
+
+@keyframes wip {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
+}
+
+/* Posities van de hero-elementen. --w = breedte, --rot = starthoek. */
+.deco--discoball-hand   { --w: 190px; --rot: -6deg;  top: 6%;  left: 3%; }
+.deco--discoball-stars  { --w: 150px; --rot: 8deg;   top: 12%; right: 5%; }
+.deco--panterstar       { --w: 110px; --rot: -14deg; top: 48%; left: 8%; }
+.deco--panterblob       { --w: 220px; --rot: 5deg;   bottom: 8%; right: 4%; }
+.deco--euro-pink        { --w: 95px;  --rot: 12deg;  bottom: 22%; left: 14%; }
+.deco--euro-blue        { --w: 80px;  --rot: -10deg; top: 24%; right: 20%; }
+.deco--barcode-yellow   { --w: 130px; --rot: -7deg;  bottom: 12%; left: 4%; }
+.deco--sticker-1111     { --w: 125px; --rot: 14deg;  top: 8%;  right: 26%; }
+.deco--cart             { --w: 160px; --rot: -4deg;  bottom: 5%; right: 22%; }
+.deco--flits            { --w: 90px;  --rot: 18deg;  top: 38%; right: 9%; }
+.deco--papierster       { --w: 100px; --rot: -8deg;  top: 62%; right: 14%; }
+
+
+/* --------------------------------------------------------------------------
+   TICKER
+   -------------------------------------------------------------------------- */
+
+.ticker {
+  background: var(--zwart);
+  color: var(--creme);
+  overflow: hidden;
+  padding: 0.7rem 0;
+  rotate: -1.2deg;
+  margin-block: 2rem;
+  width: 104%;
+  margin-inline: -2%;
+}
+
+.ticker__track {
   display: flex;
+  width: max-content;
+  animation: schuif 28s linear infinite;
+}
+
+.ticker__group {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 0.9rem + 1vw, 1.8rem);
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-right: 1.5rem;
+}
+
+.ticker__group i { color: var(--geel); font-style: normal; }
+
+@keyframes schuif {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+
+/* --------------------------------------------------------------------------
+   Secties
+   -------------------------------------------------------------------------- */
+
+.section {
+  position: relative;
+  padding-block: clamp(4rem, 10vw, 8rem);
+  overflow: clip;
+}
+
+
+/* --- Video ---------------------------------------------------------------- */
+
+.section--show .wrap { display: grid; justify-items: center; }
+
+.deco--discoball-small { --w: 120px; --rot: 10deg;  top: 8%;  left: 4%; }
+.deco--pinkstar        { --w: 90px;  --rot: -12deg; bottom: 12%; right: 6%; }
+.deco--panterstrip     { --w: 70px;  --rot: 6deg;   top: 40%; right: 3%; }
+
+.videoframe {
+  position: relative;
+  width: min(100%, 940px);
+  margin: 0;
+  rotate: -1deg;
+  background: var(--zwart);
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 10px 12px 0 rgba(17, 17, 17, 0.18);
+}
+
+.videoframe__slot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+}
+
+.videoframe__slot iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.videoframe__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  color: var(--creme);
+  padding: 1rem;
+}
+
+.videoframe__placeholder p {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.2rem, 1rem + 1.2vw, 2rem);
+  text-transform: uppercase;
+}
+
+.videoframe__placeholder small { opacity: 0.6; font-size: 0.8rem; }
+.videoframe__placeholder code { background: rgba(255, 255, 255, 0.14); color: inherit; }
+
+.videoframe__play {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: var(--geel);
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.videoframe__play::after {
+  content: "";
+  border-left: 22px solid var(--zwart);
+  border-block: 14px solid transparent;
+  margin-left: 6px;
+}
+
+/* Tape in de hoeken van het videoframe. */
+.videoframe__tape {
+  position: absolute;
+  width: 110px;
+  height: 34px;
+  background: rgba(255, 236, 0, 0.9);
+  z-index: 3;
+  clip-path: polygon(0% 10%, 3% 0%, 97% 6%, 100% 0%, 100% 90%, 97% 100%, 3% 94%, 0% 100%);
+}
+
+.videoframe__tape--tl { top: -14px; left: -26px; rotate: -32deg; }
+.videoframe__tape--br { bottom: -14px; right: -26px; rotate: -32deg; }
+
+.videoframe__price {
+  position: absolute;
+  width: 130px;
+  bottom: -46px;
+  left: -34px;
+  rotate: -9deg;
+  z-index: 3;
+}
+
+
+/* --- Foto + over ons ------------------------------------------------------ */
+
+.wrap--duo {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.deco--euro-red     { --w: 85px;  --rot: -14deg; top: 6%;  right: 2%; }
+.deco--barcode-pink { --w: 140px; --rot: 8deg;   bottom: 4%; left: -3%; }
+.deco--kraft        { --w: 60px;  --rot: -5deg;  top: 45%; left: -1%; }
+
+.photo {
+  position: relative;
+  margin: 0;
+  rotate: -1.6deg;
+}
+
+.photo__img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #e4ddd0;
+  box-shadow: 12px 14px 0 var(--zwart);
+}
+
+.photo__placeholder {
+  position: absolute;
+  inset: 0;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem 16px;
+  gap: 0.35rem;
   text-align: center;
+  padding: 1.5rem;
+  background: repeating-linear-gradient(
+    45deg, #ece4d6, #ece4d6 14px, #e4dbca 14px, #e4dbca 28px
+  );
+  box-shadow: 12px 14px 0 var(--zwart);
 }
 
-.placeholder h1 {
-  margin: 0;
-  font-size: clamp(2rem, 8vw, 4rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
+/* JS zet .is-empty als assets/img/duo.jpg nog niet bestaat. */
+.photo.is-empty .photo__placeholder { display: flex; }
+.photo.is-empty .photo__img { visibility: hidden; }
+
+.photo__placeholder strong {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 0.9rem + 1vw, 1.6rem);
+  text-transform: uppercase;
 }
 
-.placeholder p {
+.photo__placeholder span { font-size: 0.85rem; opacity: 0.7; }
+
+.photo__star {
+  position: absolute;
+  width: 110px;
+  top: -42px;
+  right: -38px;
+  rotate: 16deg;
+}
+
+.duo-text p { margin: 0 0 1.1rem; }
+
+.duo-text .lead {
+  font-size: 1.15em;
+  font-weight: 600;
+}
+
+.duo-text .kicker {
+  font-family: var(--marker);
+  font-size: 1.2em;
+  line-height: 1.4;
+  color: var(--rood);
+  margin-top: 1.8rem;
+}
+
+
+/* --- Contact -------------------------------------------------------------- */
+
+.section--contact { text-align: center; padding-bottom: 2rem; }
+
+.deco--discoball-contact { --w: 130px; --rot: -8deg;  top: 4%;  left: 1%; }
+.deco--cart-draw         { --w: 150px; --rot: 6deg;   bottom: 2%; right: -2%; }
+.deco--panterblob-2      { --w: 170px; --rot: -10deg; top: 24%; right: 1%; }
+.deco--bon               { --w: 100px; --rot: 9deg;   bottom: 6%; left: 2%; }
+
+.contact__title {
   margin: 0;
-  opacity: 0.6;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3rem, 12vw, 8rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  rotate: -1.5deg;
+}
+
+.contact__sub {
+  margin: 1rem auto 2.5rem;
+  max-width: 34ch;
+  font-family: var(--marker);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
+}
+
+.bigbutton {
+  display: inline-block;
+  padding: 0.75em 1.4em;
+  background: var(--roze);
+  color: var(--zwart);
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 0.9rem + 1.4vw, 2.2rem);
+  text-transform: uppercase;
+  text-decoration: none;
+  rotate: -1.5deg;
+  box-shadow: 8px 9px 0 var(--zwart);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.bigbutton:hover,
+.bigbutton:focus-visible {
+  background: var(--geel);
+  transform: translate(3px, 4px);
+  box-shadow: 4px 4px 0 var(--zwart);
+}
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 1.6rem;
+  margin-top: 2.5rem;
+  font-family: var(--display);
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.2rem);
+  text-transform: uppercase;
+}
+
+.socials a {
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.socials a:hover,
+.socials a:focus-visible { border-bottom-color: var(--rood); color: var(--rood); }
+
+.footer {
+  position: relative;
+  z-index: 2;
+  max-width: var(--maxw);
+  margin: 5rem auto 0;
+  padding: 1.5rem var(--gutter);
+  border-top: 3px solid var(--zwart);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.footer a { text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+
+/* --------------------------------------------------------------------------
+   Reveal bij scrollen
+   -------------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-in { opacity: 1; transform: none; }
+
+
+/* --------------------------------------------------------------------------
+   Focus
+   -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 3px solid var(--blauw);
+  outline-offset: 3px;
+}
+
+
+/* --------------------------------------------------------------------------
+   Tablet
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .wrap--duo { grid-template-columns: 1fr; }
+  .photo { max-width: 460px; margin-inline: auto; }
+
+  /* Minder collage op kleinere schermen, anders wordt het rommelig. */
+  .deco--euro-blue,
+  .deco--flits,
+  .deco--papierster,
+  .deco--cart,
+  .deco--panterblob-2,
+  .deco--kraft { display: none; }
+}
+
+
+/* --------------------------------------------------------------------------
+   Mobiel
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  :root { --gutter: 18px; }
+
+  .hero { padding-top: 5rem; }
+
+  /* Hero-elementen schuiven naar de randen en worden kleiner, zodat de
+     wordmark in het midden leesbaar blijft. */
+  .deco--discoball-hand  { --w: 110px; top: 4%; left: -4%; }
+  .deco--discoball-stars { --w: 95px;  top: 7%; right: -3%; }
+  .deco--panterstar      { --w: 70px;  top: 70%; left: 2%; }
+  .deco--panterblob      { --w: 140px; bottom: 2%; right: -8%; }
+  .deco--euro-pink       { --w: 60px;  bottom: 10%; left: 6%; }
+  .deco--barcode-yellow  { --w: 90px;  bottom: 3%; left: -2%; }
+  .deco--sticker-1111    { --w: 80px;  top: 3%; right: 30%; }
+
+  .deco--discoball-small   { --w: 80px; }
+  .deco--pinkstar          { --w: 60px; }
+  .deco--panterstrip       { display: none; }
+  .deco--discoball-contact { --w: 85px; }
+  .deco--cart-draw         { --w: 95px; }
+  .deco--bon               { --w: 70px; }
+  .deco--euro-red          { --w: 60px; }
+  .deco--barcode-pink      { --w: 95px; }
+
+  .videoframe__price { width: 92px; bottom: -32px; left: -14px; }
+  .videoframe__tape  { width: 80px; height: 26px; }
+
+  .photo__star { width: 74px; top: -28px; right: -16px; }
+
+  .footer { justify-content: center; text-align: center; }
+}
+
+
+/* --------------------------------------------------------------------------
+   Bewegingsvoorkeur
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .deco, .reveal { opacity: 1; transform: none; }
+  .ticker__track { animation: none; }
 }

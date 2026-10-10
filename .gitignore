@@ -2,3 +2,6 @@
 .vercel
 node_modules/
 *.log
+
+# lokale preview-helper
+sync-preview.sh

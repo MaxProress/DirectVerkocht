@@ -1,1 +1,180 @@
-// Nog geen scripts nodig. Bestand staat klaar voor later.
+/* ==========================================================================
+   DIRECT VERKOCHT
+   Geen frameworks, geen build step. Alles draait op standaard browser-API's.
+   ========================================================================== */
+
+(function () {
+  "use strict";
+
+  var stilleVoorkeur = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* ------------------------------------------------------------------------
+     1. Wordmark: elke letter los, zodat hij per letter kan wiebelen bij hover
+     ------------------------------------------------------------------------ */
+
+  document.querySelectorAll(".wordmark__line").forEach(function (regel) {
+    var tekst = regel.textContent.trim();
+    regel.textContent = "";
+
+    Array.prototype.forEach.call(tekst, function (teken, i) {
+      var span = document.createElement("span");
+      span.className = "ltr";
+      span.textContent = teken;
+      // Kleine willekeurige starthoek, zodat het handgezet aanvoelt.
+      span.style.transform = "rotate(" + (((i * 37) % 5) - 2) * 0.6 + "deg)";
+      regel.appendChild(span);
+    });
+
+    // Schermlezers krijgen de hele regel, niet 24 losse letters.
+    regel.setAttribute("aria-label", tekst);
+  });
+
+
+  /* ------------------------------------------------------------------------
+     2. Reveal bij scrollen
+     ------------------------------------------------------------------------ */
+
+  var teOnthullen = document.querySelectorAll(
+    ".deco, .tape, .videoframe, .photo, .duo-text, .contact__title, .contact__sub, .bigbutton, .socials"
+  );
+
+  teOnthullen.forEach(function (el) {
+    if (!el.classList.contains("deco")) el.classList.add("reveal");
+    // Elke deco krijgt een eigen wiebelduur, anders bewegen ze als één blok.
+    if (el.classList.contains("deco")) {
+      el.style.setProperty("--dur", (6 + Math.random() * 5).toFixed(1) + "s");
+    }
+  });
+
+  if ("IntersectionObserver" in window) {
+    var waarnemer = new IntersectionObserver(function (items) {
+      items.forEach(function (item) {
+        if (item.isIntersecting) {
+          item.target.classList.add("is-in");
+          waarnemer.unobserve(item.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+
+    teOnthullen.forEach(function (el) { waarnemer.observe(el); });
+  } else {
+    teOnthullen.forEach(function (el) { el.classList.add("is-in"); });
+  }
+
+
+  /* ------------------------------------------------------------------------
+     3. Collage-elementen laten meedrijven met de scroll
+     ------------------------------------------------------------------------ */
+
+  var drijvers = Array.prototype.slice.call(document.querySelectorAll(".deco[data-drift]"));
+  var wachtOpFrame = false;
+
+  function verplaatsDeco() {
+    var midden = window.innerHeight / 2;
+
+    drijvers.forEach(function (el) {
+      var vak = el.getBoundingClientRect();
+      if (vak.bottom < -200 || vak.top > window.innerHeight + 200) return;
+
+      var afstand = (vak.top + vak.height / 2) - midden;
+      var kracht = parseFloat(el.dataset.drift) || 0;
+      el.style.setProperty("--drift-y", (afstand * kracht * -0.12).toFixed(1) + "px");
+    });
+
+    wachtOpFrame = false;
+  }
+
+  function planVerplaatsing() {
+    if (wachtOpFrame) return;
+    wachtOpFrame = true;
+    requestAnimationFrame(verplaatsDeco);
+  }
+
+  if (!stilleVoorkeur.matches && drijvers.length) {
+    window.addEventListener("scroll", planVerplaatsing, { passive: true });
+    window.addEventListener("resize", planVerplaatsing);
+    verplaatsDeco();
+  }
+
+
+  /* ------------------------------------------------------------------------
+     4. Video: iframe pas laden na een klik, zodat de pagina snel blijft
+     ------------------------------------------------------------------------ */
+
+  var frame = document.querySelector(".videoframe");
+
+  if (frame) {
+    var id = (frame.dataset.video || "").trim();
+    var soort = (frame.dataset.type || "youtube").trim();
+    var slot = frame.querySelector(".videoframe__slot");
+    var plek = frame.querySelector(".videoframe__placeholder");
+
+    if (id) {
+      plek.querySelector("p").textContent = "Bekijk de video";
+      plek.querySelector("small").remove();
+
+      var knop = document.createElement("button");
+      knop.type = "button";
+      knop.className = "videoframe__trigger";
+      knop.setAttribute("aria-label", "Video afspelen");
+      Object.assign(knop.style, {
+        position: "absolute", inset: "0", width: "100%", height: "100%",
+        background: "transparent", border: "0", cursor: "pointer", zIndex: "2"
+      });
+
+      // YouTube levert een gratis poster-afbeelding; Vimeo niet.
+      if (soort === "youtube") {
+        slot.style.backgroundImage = 'url("https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg")';
+        slot.style.backgroundSize = "cover";
+        slot.style.backgroundPosition = "center";
+        plek.style.background = "rgba(0, 0, 0, 0.35)";
+      }
+
+      knop.addEventListener("click", function () {
+        var bron = soort === "vimeo"
+          ? "https://player.vimeo.com/video/" + encodeURIComponent(id) + "?autoplay=1"
+          : "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(id) + "?autoplay=1&rel=0";
+
+        var iframe = document.createElement("iframe");
+        iframe.src = bron;
+        iframe.title = "Direct Verkocht — video";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+
+        slot.innerHTML = "";
+        slot.style.backgroundImage = "none";
+        slot.appendChild(iframe);
+      });
+
+      slot.appendChild(knop);
+    }
+  }
+
+
+  /* ------------------------------------------------------------------------
+     5. Foto: placeholder tonen zolang duo.jpg er nog niet is
+     ------------------------------------------------------------------------ */
+
+  var foto = document.querySelector(".photo");
+
+  if (foto) {
+    var afbeelding = foto.querySelector("img");
+
+    var markeerLeeg = function () { foto.classList.add("is-empty"); };
+
+    if (afbeelding.complete) {
+      if (!afbeelding.naturalWidth) markeerLeeg();
+    } else {
+      afbeelding.addEventListener("error", markeerLeeg);
+    }
+  }
+
+
+  /* ------------------------------------------------------------------------
+     6. Jaartal in de footer
+     ------------------------------------------------------------------------ */
+
+  var jaar = document.getElementById("jaar");
+  if (jaar) jaar.textContent = new Date().getFullYear();
+
+})();

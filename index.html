@@ -3,15 +3,184 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DirectVerkocht</title>
-  <meta name="description" content="DirectVerkocht — binnenkort online.">
+
+  <title>Direct Verkocht — DJ-duo</title>
+  <meta name="description" content="Direct Verkocht is een energiek DJ-duo met een zwak voor foute hits, goede feestjes en alles wat nét een beetje over de top is.">
+
+  <meta property="og:title" content="Direct Verkocht — DJ-duo">
+  <meta property="og:description" content="Foute hits, goede feestjes en alles wat nét een beetje over de top is.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/duo.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <main class="placeholder">
-    <h1>DirectVerkocht</h1>
-    <p>Binnenkort online.</p>
-  </main>
-  <script src="assets/js/main.js"></script>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="top">
+
+  <!-- Collage-elementen. data-drift = hoe sterk iets meebeweegt bij scrollen. -->
+  <div class="deco-layer" aria-hidden="true">
+    <img class="deco deco--discoball-hand" src="assets/img/elements/2.webp" alt="" data-drift="0.18">
+    <img class="deco deco--discoball-stars" src="assets/img/elements/4.webp" alt="" data-drift="0.3">
+    <img class="deco deco--panterstar"      src="assets/img/elements/14.webp" alt="" data-drift="-0.22">
+    <img class="deco deco--panterblob"      src="assets/img/elements/11.webp" alt="" data-drift="0.12">
+    <img class="deco deco--euro-pink"       src="assets/img/elements/22.webp" alt="" data-drift="-0.3">
+    <img class="deco deco--euro-blue"       src="assets/img/elements/21.webp" alt="" data-drift="0.26">
+    <img class="deco deco--barcode-yellow"  src="assets/img/elements/10.webp" alt="" data-drift="-0.14">
+    <img class="deco deco--sticker-1111"    src="assets/img/elements/5.webp" alt="" data-drift="0.34">
+    <img class="deco deco--cart"            src="assets/img/elements/16.webp" alt="" data-drift="-0.1">
+    <img class="deco deco--flits"           src="assets/img/elements/19.webp" alt="" data-drift="0.2">
+    <img class="deco deco--papierster"      src="assets/img/elements/18.webp" alt="" data-drift="-0.26">
+  </div>
+
+  <div class="hero__inner">
+    <h1 class="wordmark">
+      <span class="wordmark__line wordmark__line--1">Direct</span>
+      <span class="wordmark__line wordmark__line--2">Verkocht</span>
+    </h1>
+
+    <p class="tape tape--tagline">Foute hits. Goede feestjes.</p>
+
+    <a class="scroll-hint" href="#show">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M12 4v15m0 0-6-6m6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+
+<!-- ============================================================
+     TICKER
+     ============================================================ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span class="ticker__group">
+      Classy&nbsp;Trashy <i>★</i> Direct&nbsp;Verkocht <i>★</i> €0,00 <i>★</i> Foute&nbsp;hits <i>★</i> Goede&nbsp;feestjes <i>★</i>
+    </span>
+    <span class="ticker__group">
+      Classy&nbsp;Trashy <i>★</i> Direct&nbsp;Verkocht <i>★</i> €0,00 <i>★</i> Foute&nbsp;hits <i>★</i> Goede&nbsp;feestjes <i>★</i>
+    </span>
+  </div>
+</div>
+
+
+<main>
+
+  <!-- ============================================================
+       VIDEO
+       ============================================================ -->
+  <section class="section section--show" id="show">
+    <div class="deco-layer" aria-hidden="true">
+      <img loading="lazy" decoding="async" class="deco deco--discoball-small" src="assets/img/elements/3.webp" alt="" data-drift="0.22">
+      <img loading="lazy" decoding="async" class="deco deco--pinkstar"        src="assets/img/elements/20.webp" alt="" data-drift="-0.28">
+      <img loading="lazy" decoding="async" class="deco deco--panterstrip"     src="assets/img/elements/12.webp" alt="" data-drift="0.16">
+    </div>
+
+    <div class="wrap">
+      <h2 class="tape tape--heading">De show</h2>
+
+      <!--
+        VIDEO INSTELLEN
+        Zet de YouTube- of Vimeo-ID in data-video en kies het type in data-type.
+        Voorbeeld YouTube: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                           -> data-type="youtube" data-video="dQw4w9WgXcQ"
+        Voorbeeld Vimeo:   https://vimeo.com/123456789
+                           -> data-type="vimeo"   data-video="123456789"
+        Laat data-video leeg zolang er nog geen video is; dan toont de
+        placeholder zichzelf.
+      -->
+      <figure class="videoframe" data-type="youtube" data-video="">
+        <div class="videoframe__tape videoframe__tape--tl" aria-hidden="true"></div>
+        <div class="videoframe__tape videoframe__tape--br" aria-hidden="true"></div>
+
+        <div class="videoframe__slot">
+          <div class="videoframe__placeholder">
+            <span class="videoframe__play" aria-hidden="true"></span>
+            <p>Video komt hier</p>
+            <small>Zet de YouTube- of Vimeo-ID in <code>data-video</code></small>
+          </div>
+        </div>
+
+        <img loading="lazy" decoding="async" class="videoframe__price" src="assets/img/elements/6.webp" alt="" aria-hidden="true">
+      </figure>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOTO + OVER ONS
+       ============================================================ -->
+  <section class="section section--duo" id="wij">
+    <div class="deco-layer" aria-hidden="true">
+      <img loading="lazy" decoding="async" class="deco deco--euro-red"    src="assets/img/elements/23.webp" alt="" data-drift="-0.24">
+      <img loading="lazy" decoding="async" class="deco deco--barcode-pink" src="assets/img/elements/8.webp" alt="" data-drift="0.18">
+      <img loading="lazy" decoding="async" class="deco deco--kraft"        src="assets/img/elements/13.webp" alt="" data-drift="-0.12">
+    </div>
+
+    <div class="wrap wrap--duo">
+      <figure class="photo">
+        <!-- Zet jullie foto neer als assets/img/duo.jpg -->
+        <img class="photo__img" src="assets/img/duo.jpg" alt="Direct Verkocht, het DJ-duo">
+        <figcaption class="photo__placeholder">
+          <strong>Grote foto van jullie</strong>
+          <span>Plaats het bestand als <code>assets/img/duo.jpg</code></span>
+        </figcaption>
+        <img loading="lazy" decoding="async" class="photo__star" src="assets/img/elements/14.webp" alt="" aria-hidden="true">
+      </figure>
+
+      <div class="duo-text">
+        <h2 class="tape tape--heading">Dat zijn wij</h2>
+        <p class="lead">Direct Verkocht is een energiek DJ-duo met een zwak voor foute hits, goede feestjes en alles wat nét een beetje over de top is.</p>
+        <p>Van guilty pleasures tot echte klassiekers. Als het werkt op de dansvloer, draaien wij het.</p>
+        <p>Onze naam is een knipoog naar de wereld van Marktplaats, kringloopvondsten en koopjesjagers. Onze stijl? <strong>Classy Trashy.</strong> Denk panterprint, glitter, discoballen en een beetje kitsch, maar dan wél met smaak.</p>
+        <p class="kicker">Want laten we eerlijk zijn… de foutste platen maken vaak de beste feestjes.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CONTACT
+       ============================================================ -->
+  <section class="section section--contact" id="contact">
+    <div class="deco-layer" aria-hidden="true">
+      <img loading="lazy" decoding="async" class="deco deco--discoball-contact" src="assets/img/elements/4.webp" alt="" data-drift="0.2">
+      <img loading="lazy" decoding="async" class="deco deco--cart-draw"         src="assets/img/elements/15.webp" alt="" data-drift="-0.16">
+      <img loading="lazy" decoding="async" class="deco deco--panterblob-2"      src="assets/img/elements/11.webp" alt="" data-drift="0.1">
+      <img loading="lazy" decoding="async" class="deco deco--bon"               src="assets/img/elements/17.webp" alt="" data-drift="-0.22">
+    </div>
+
+    <div class="wrap">
+      <h2 class="contact__title">Boek ons</h2>
+      <p class="contact__sub">Feest, festival, bruiloft of bedrijfsborrel — laat maar weten.</p>
+
+      <!-- TODO: vervang door het echte mailadres -->
+      <a class="bigbutton" href="mailto:info@directverkocht.nl">info@directverkocht.nl</a>
+
+      <!-- TODO: vervang door de echte social links -->
+      <nav class="socials" aria-label="Sociale media">
+        <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://soundcloud.com/" target="_blank" rel="noopener">SoundCloud</a>
+        <a href="https://open.spotify.com/" target="_blank" rel="noopener">Spotify</a>
+      </nav>
+    </div>
+
+    <footer class="footer">
+      <span>© <span id="jaar">2026</span> Direct Verkocht</span>
+      <a href="#top">Terug naar boven</a>
+    </footer>
+  </section>
+
+</main>
+
+<script src="assets/js/main.js"></script>
 </body>
 </html>
