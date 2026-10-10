@@ -35,6 +35,10 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* Moet óók op html staan: anders schuift de overflow van body door naar
+     de viewport en klipt body zichzelf niet meer. De scheve ticker steekt
+     dan rechts buiten beeld. */
+  overflow-x: clip;
 }
 
 body {
@@ -46,6 +50,18 @@ body {
   line-height: 1.65;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Papierkorrel over de hele pagina, zodat het crème geen vlakke digitale
+   kleur is. Inline SVG-ruis: geen extra request. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
 }
 
 img { display: block; max-width: 100%; height: auto; }
@@ -105,6 +121,29 @@ code {
 }
 
 .deco.is-in { animation: wiebel var(--dur, 7s) ease-in-out infinite; }
+
+/* Gescheurde vlakken met echte print erin: panter of disco. Geen <img>,
+   maar een div, zodat het vlak elke maat en verhouding aankan. */
+.patch {
+  height: var(--h, 200px);
+  background-size: cover;
+  background-position: center;
+  clip-path: polygon(
+     2%  6%, 10%  0%, 22%  5%, 35%  1%, 48%  7%, 61%  2%, 74%  8%, 86%  3%, 97%  9%,
+    100% 22%, 95% 35%, 99% 48%, 94% 62%, 100% 75%, 96% 88%, 99% 97%,
+     88% 94%, 76% 100%, 63% 95%, 50% 99%, 37% 93%, 25% 98%, 12% 94%, 3% 99%,
+      0% 86%,  5% 72%,  1% 58%,  6% 44%,  0% 30%, 4% 18%
+  );
+}
+
+.patch--panter { background-image: url("../img/textures/panter.webp"); }
+.patch--disco  { background-image: url("../img/textures/disco.webp"); }
+
+/* Krantensnippers. De tweede is gespiegeld, zodat je niet ziet dat het
+   dezelfde snipper is. */
+.deco--krant { --w: 90px; }
+.deco--krant-flip { --w: 90px; }
+.deco--krant-flip.is-in { scale: -1 1; }
 
 
 /* --------------------------------------------------------------------------
@@ -220,6 +259,10 @@ code {
 .deco--flits            { --w: 90px;  --rot: 18deg;  top: 38%; right: 9%; }
 .deco--papierster       { --w: 100px; --rot: -8deg;  top: 62%; right: 14%; }
 
+.deco--patch-hero-l { --w: 300px; --h: 230px; --rot: -7deg; top: 52%; left: -6%; }
+.deco--patch-hero-r { --w: 260px; --h: 200px; --rot: 6deg;  top: -4%; right: -5%; }
+.deco--krant-hero   { --rot: 9deg;  top: 2%; left: 22%; }
+
 
 /* --------------------------------------------------------------------------
    TICKER
@@ -276,6 +319,9 @@ code {
 .deco--discoball-small { --w: 120px; --rot: 10deg;  top: 8%;  left: 4%; }
 .deco--pinkstar        { --w: 90px;  --rot: -12deg; bottom: 12%; right: 6%; }
 .deco--panterstrip     { --w: 70px;  --rot: 6deg;   top: 40%; right: 3%; }
+
+.deco--patch-show  { --w: 240px; --h: 190px; --rot: 8deg;   bottom: -4%; left: -5%; }
+.deco--krant-show  { --rot: -11deg; top: 14%; right: -1%; }
 
 .videoframe {
   position: relative;
@@ -378,6 +424,9 @@ code {
 .deco--barcode-pink { --w: 140px; --rot: 8deg;   bottom: 4%; left: -3%; }
 .deco--kraft        { --w: 60px;  --rot: -5deg;  top: 45%; left: -1%; }
 
+.deco--patch-duo  { --w: 280px; --h: 215px; --rot: -9deg; top: -5%; right: -7%; }
+.deco--krant-duo  { --rot: 7deg; bottom: -2%; right: -1%; }
+
 .photo {
   position: relative;
   margin: 0;
@@ -452,6 +501,10 @@ code {
 .deco--cart-draw         { --w: 150px; --rot: 6deg;   bottom: 2%; right: -2%; }
 .deco--panterblob-2      { --w: 170px; --rot: -10deg; top: 24%; right: 1%; }
 .deco--bon               { --w: 100px; --rot: 9deg;   bottom: 6%; left: 2%; }
+
+.deco--patch-contact-l { --w: 230px; --h: 180px; --rot: 7deg;   bottom: 2%; left: -6%; }
+.deco--patch-contact-r { --w: 260px; --h: 200px; --rot: -8deg;  top: -3%; right: -6%; }
+.deco--krant-contact   { --rot: -8deg; top: 42%; left: 3%; }
 
 .contact__title {
   margin: 0;
@@ -567,7 +620,8 @@ code {
   .deco--papierster,
   .deco--cart,
   .deco--panterblob-2,
-  .deco--kraft { display: none; }
+  .deco--kraft,
+  .deco--krant-show { display: none; }
 }
 
 
@@ -603,6 +657,23 @@ code {
   .videoframe__tape  { width: 80px; height: 26px; }
 
   .photo__star { width: 74px; top: -28px; right: -16px; }
+
+  /* De gescheurde vlakken blijven, maar kleiner en verder naar de rand,
+     anders lopen ze onder de tekst door. */
+  .deco--patch-hero-l    { --w: 170px; --h: 130px; top: 58%; left: -12%; }
+  .deco--patch-hero-r    { --w: 150px; --h: 115px; top: -2%; right: -12%; }
+  .deco--patch-show      { --w: 140px; --h: 110px; left: -12%; }
+  .deco--patch-duo       { --w: 160px; --h: 125px; right: -14%; }
+  .deco--patch-contact-l { --w: 130px; --h: 100px; left: -12%; }
+  .deco--patch-contact-r { --w: 150px; --h: 115px; right: -14%; }
+
+  /* Valt op mobiel boven op het grote panter-vlak; er is al genoeg panter. */
+  .deco--panterstar { display: none; }
+
+  .deco--krant { --w: 58px; }
+  .deco--krant-hero    { top: 1%; left: 30%; }
+  .deco--krant-contact { top: 48%; left: -2%; }
+  .deco--krant-duo     { display: none; }
 
   .footer { justify-content: center; text-align: center; }
 }

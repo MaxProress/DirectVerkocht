@@ -2,14 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dv-site",
+      "name": "dv",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "-m",
-        "http.server",
-        "4173"
+        "/private/tmp/claude-501/-Users-maxbroenink-Desktop-DirectVerkocht/c773761b-6cdb-469e-ba72-883c35854264/scratchpad/serve.py"
       ],
-      "port": 4173
+      "port": 4399
     }
   ]
 }
