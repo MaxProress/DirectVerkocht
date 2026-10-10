@@ -264,9 +264,13 @@ code {
 .slinger {
   position: absolute;
   inset: 0 0 auto 0;
-  z-index: 3;
   pointer-events: none;
 }
+
+/* Twee lagen, zodat er slierten vóór én achter de wordmark hangen. Dat
+   geeft diepte: de achterste verdwijnen deels achter de letters. */
+.slinger--achter { z-index: 1; }
+.slinger--voor   { z-index: 3; }
 
 .slinger__rail {
   height: clamp(16px, 2.4vw, 28px);
@@ -300,9 +304,10 @@ code {
   position: absolute;
   top: clamp(13px, 2.1vw, 25px);
   left: var(--x);
-  width: var(--w, 22px);
+  /* --wf schaalt de breedte per schermformaat; JS zet alleen --w. */
+  width: calc(var(--w, 22px) * var(--wf, 1));
   height: var(--len);
-  margin-left: calc(var(--w, 22px) / -2);
+  margin-left: calc(var(--w, 22px) * var(--wf, 1) / -2);
   transform-origin: 50% 0;
   /* --val = de inval bij het laden, --kantel = de scheefstand waarmee hij
      hangt, zodat ze niet allemaal kaarsrecht naar beneden wijzen. */
@@ -394,11 +399,11 @@ code {
   animation: slingert var(--tempo, 5s) ease-in-out infinite;
 }
 
-.sliert.is-neer .deel--1 { --slag: 1.4deg; animation-delay: 0s; }
-.sliert.is-neer .deel--2 { --slag: 1.9deg; animation-delay: calc(var(--tempo, 5s) * -0.05); }
-.sliert.is-neer .deel--3 { --slag: 2.4deg; animation-delay: calc(var(--tempo, 5s) * -0.10); }
-.sliert.is-neer .deel--4 { --slag: 3.0deg; animation-delay: calc(var(--tempo, 5s) * -0.15); }
-.sliert.is-neer .deel--5 { --slag: 3.7deg; animation-delay: calc(var(--tempo, 5s) * -0.20); }
+.sliert.is-neer .deel--1 { --slag: 2.2deg; animation-delay: var(--fase, 0s); }
+.sliert.is-neer .deel--2 { --slag: 3.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.05); }
+.sliert.is-neer .deel--3 { --slag: 4.1deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.10); }
+.sliert.is-neer .deel--4 { --slag: 5.2deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.15); }
+.sliert.is-neer .deel--5 { --slag: 6.4deg; animation-delay: calc(var(--fase, 0s) + var(--tempo, 5s) * -0.20); }
 
 @keyframes slingert {
   0%, 100% { --zwaai: calc(var(--slag) * -1); }
@@ -839,6 +844,13 @@ code {
   .cluster--contact-tr { --cw: 125px; right: -9%; }
   .cluster--contact-bl { --cw: 110px; left: -9%; }
   .cluster--contact-br { --cw: 115px; right: -7%; }
+
+  /* Op een telefoon blijven er zeven over, en smaller: twintig slierten
+     verstoppen de wordmark, en honderd delen animeren is zonde van de accu. */
+  .slinger--achter .sliert:not(:nth-of-type(3n + 2)),
+  .slinger--voor .sliert:not(:nth-of-type(3n + 1)) { display: none; }
+
+  .sliert { --wf: 0.68; }
 
   .videoframe__price { width: 92px; bottom: -32px; left: -14px; }
   .videoframe__tape  { width: 80px; height: 26px; }

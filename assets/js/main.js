@@ -109,10 +109,10 @@
      beetje overheen. Een klik geeft ze een duw.
      ------------------------------------------------------------------------ */
 
-  var slinger = document.querySelector(".slinger");
+  var slingers = Array.prototype.slice.call(document.querySelectorAll(".slinger"));
 
-  if (slinger) {
-    var slierten = Array.prototype.slice.call(slinger.querySelectorAll(".sliert"));
+  if (slingers.length) {
+    var slierten = Array.prototype.slice.call(document.querySelectorAll(".sliert"));
     var hero = document.querySelector(".hero");
 
     var SCHARNIEREN = 5;
@@ -126,7 +126,8 @@
       el.style.setProperty("--len", len + "svh");
       el.style.setProperty("--w", (11 + (i % 4) * 3) + "px");
       el.classList.add("sliert--t" + tex);
-      el.style.setProperty("--tempo", (4.2 + (i % 5) * 0.7).toFixed(1) + "s");
+      el.style.setProperty("--tempo", (3.9 + ((i * 37) % 9) * 0.42).toFixed(2) + "s");
+      el.style.setProperty("--fase", (-((i * 61) % 11) * 0.37).toFixed(2) + "s");
       // Niet allemaal tegelijk: van links naar rechts, met wat ruis erin.
       el.style.setProperty("--vertraging", (0.15 + i * 0.045 + (i % 3) * 0.03).toFixed(2) + "s");
       // Niemand hangt kaarsrecht.
@@ -163,7 +164,9 @@
       // Eén frame wachten zodat de beginstand echt getekend is; anders
       // slaat de browser de val over.
       requestAnimationFrame(function () {
-        requestAnimationFrame(function () { slinger.classList.add("is-los"); });
+        requestAnimationFrame(function () {
+          slingers.forEach(function (s) { s.classList.add("is-los"); });
+        });
       });
 
       // Per sliert één veertje per scharnier. Het bovenste volgt de cursor,
@@ -177,9 +180,9 @@
         };
       });
 
-      var STIJFHEID = [0.15, 0.13, 0.115, 0.10, 0.085];
-      var DEMPING   = [0.86, 0.87, 0.88, 0.89, 0.90];
-      var DOORGIFTE = 0.72;
+      var STIJFHEID = [0.10, 0.085, 0.07, 0.056, 0.045];
+      var DEMPING   = [0.905, 0.915, 0.925, 0.935, 0.945];
+      var DOORGIFTE = 0.8;
 
       var muisX = null, loopt = false;
 
@@ -231,7 +234,7 @@
             if (Math.abs(afstand) <= bereik) {
               // Dichterbij = verder opzij, en altijd wég van de cursor.
               var kracht = 1 - Math.abs(afstand) / bereik;
-              kop = (afstand >= 0 ? 1 : -1) * kracht * 7;
+              kop = (afstand >= 0 ? 1 : -1) * kracht * 9;
             }
           }
 
