@@ -322,8 +322,9 @@ code {
   width: 100%;
   height: 100%;
   transform-origin: 50% 0;
-  /* --duw komt van de cursor (JS), --zwaai van het rustige wiegen (CSS). */
-  rotate: calc(var(--duw, 0deg) + var(--zwaai, 0deg));
+  /* --duw komt van de cursor (JS); --zwaai en --zwaai2 zijn twee golven
+     die over elkaar heen lopen. */
+  rotate: calc(var(--duw, 0deg) + var(--zwaai, 0deg) + var(--zwaai2, 0deg));
 }
 
 /* Het bovenste deel. Zijn hoogte hangt af van het aantal scharnieren en
@@ -386,6 +387,12 @@ code {
   initial-value: 0deg;
 }
 
+@property --zwaai2 {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 /*
   Rustig slingeren zodra de sliert hangt. De drie delen lopen op dezelfde
   duur maar met een versprongen fase, dus de beweging loopt als een golf
@@ -397,9 +404,27 @@ code {
   animation: slingert var(--tempo, 5s) ease-in-out infinite;
 }
 
+/*
+  Eén sinus per scharnier herhaalt zich exact, en dat zie je: het beweegt
+  als een metronoom. De slierten vooraan krijgen er een tweede golf
+  overheen met een andere, niet-passende periode. Samen herhalen ze zich
+  pas na minuten, en omdat golf B de andere kant op loopt dan golf A
+  buigen de scharnieren soms tegen elkaar in — dat geeft de S-bocht die
+  een echte sliert maakt.
+*/
+.sliert--vloeiend.is-neer .deel {
+  animation: slingert var(--tempo, 5s) ease-in-out infinite,
+             slingert-b var(--tempo2, 8s) ease-in-out infinite;
+}
+
 @keyframes slingert {
   0%, 100% { --zwaai: calc(var(--slag) * -1); }
   50%      { --zwaai: var(--slag); }
+}
+
+@keyframes slingert-b {
+  0%, 100% { --zwaai2: var(--slag2, 0deg); }
+  50%      { --zwaai2: calc(var(--slag2, 0deg) * -1); }
 }
 
 
@@ -839,7 +864,7 @@ code {
 
   /* Op een telefoon blijven er zeven over, en smaller: twintig slierten
      verstoppen de wordmark, en honderd delen animeren is zonde van de accu. */
-  .slinger--achter .sliert:not(:nth-of-type(5n + 3)),
+  .slinger--achter .sliert:not(:nth-of-type(6n + 3)),
   .slinger--voor .sliert:not(:nth-of-type(2n + 1)) { display: none; }
 
   .sliert { --wf: 0.68; }

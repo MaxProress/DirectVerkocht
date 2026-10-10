@@ -149,21 +149,35 @@
       var len = parseFloat(el.dataset.len) || 45;
       var tex = el.dataset.tex || "1";
 
-      // De achterste laag zit grotendeels achter de wordmark, dus daar zijn
-      // drie scharnieren genoeg. Dat scheelt flink wat rekenwerk bij een
-      // dicht gordijn; vooraan blijven het er vijf voor een vloeiende bocht.
-      var scharnieren = el.closest(".slinger--achter") ? 3 : 5;
+      // De achterste laag zit grotendeels achter de wordmark: daar is een
+      // knik niet te zien en zijn drie scharnieren genoeg. Dat scheelt veel
+      // rekenwerk bij een dicht gordijn. Vooraan hangen er maar zeven, dus
+      // die mogen zeven scharnieren hebben voor een echt vloeiende bocht.
+      var achter = !!el.closest(".slinger--achter");
+      var scharnieren = achter ? 3 : 7;
+
+      // Alleen de slierten vooraan krijgen de tweede golf: daar kijk je naar,
+      // en het zijn er weinig genoeg om het te kunnen betalen.
+      if (!achter) el.classList.add("sliert--vloeiend");
+
+      var tempo = 4.6 + ((i * 37) % 11) * 0.48;
 
       el.style.setProperty("--x", x + "%");
       el.style.setProperty("--len", len + "svh");
       el.style.setProperty("--w", (11 + (i % 4) * 3) + "px");
       el.classList.add("sliert--t" + tex);
-      el.style.setProperty("--tempo", (4.6 + ((i * 37) % 11) * 0.48).toFixed(2) + "s");
+      el.style.setProperty("--tempo", tempo.toFixed(2) + "s");
+      // Niet-passende periode: samen herhalen de twee golven zich pas na
+      // minuten, dus je betrapt het patroon niet.
+      el.style.setProperty("--tempo2", (tempo * 1.618 + 0.4).toFixed(2) + "s");
       el.style.setProperty("--fase", (-((i * 61) % 13) * 0.41).toFixed(2) + "s");
+      el.style.setProperty("--fase2", (-((i * 47) % 17) * 0.33).toFixed(2) + "s");
       // Niet allemaal tegelijk, maar ook niet keurig van links naar rechts.
       el.style.setProperty("--vertraging", (0.12 + ((i * 29) % 23) * 0.055).toFixed(2) + "s");
-      // Niemand hangt kaarsrecht.
-      el.style.setProperty("--kantel", (((i * 53) % 7) - 3) * 0.8 + "deg");
+      // Niemand hangt kaarsrecht. Achteraan minder scheef: 58 slierten die
+      // allemaal uitwaaieren worden stro, geen gordijn.
+      el.style.setProperty("--kantel",
+        (((i * 53) % 7) - 3) * (achter ? 0.35 : 0.8) + "deg");
 
       // De in elkaar hangende delen. Staan hier en niet in de opmaak, want
       // het is puur versiering en het scheelt tientallen keren dezelfde
@@ -175,11 +189,21 @@
         var deel = document.createElement("i");
         deel.className = "deel deel--" + n + (n === scharnieren ? " deel--eind" : "");
         if (n === 1) deel.style.height = (100 / scharnieren).toFixed(2) + "%";
-        // Dieper = grotere slag en meer achterloop, zodat de beweging als
-        // een golf naar de punt loopt.
-        deel.style.setProperty("--slag", (2.8 + diep * 5.0).toFixed(2) + "deg");
-        deel.style.animationDelay =
-          "calc(var(--fase, 0s) + var(--tempo, 5s) * " + (-0.24 * diep).toFixed(3) + ")";
+
+        // Dieper = grotere slag en meer achterloop, zodat golf A als een
+        // golf naar de punt toe loopt. De achterste laag beweegt ingetogen:
+        // daar is het de massa die telt, niet de losse sliert.
+        var basis = achter ? 1.5 : 2.6;
+        var groei = achter ? 2.3 : 5.2;
+        deel.style.setProperty("--slag", (basis + diep * groei).toFixed(2) + "deg");
+        deel.style.setProperty("--slag2", (1.3 + diep * 2.9).toFixed(2) + "deg");
+
+        // Golf B loopt de andere kant op, van de punt naar boven. Waar de
+        // twee elkaar tegenkomen buigt de sliert in een S.
+        deel.style.animationDelay = [
+          "calc(var(--fase, 0s) + var(--tempo, 5s) * " + (-0.45 * diep).toFixed(3) + ")",
+          "calc(var(--fase2, 0s) + var(--tempo2, 8s) * " + (0.38 * diep).toFixed(3) + ")"
+        ].join(", ");
 
         var blad = document.createElement("i");
         blad.className = "blad";
@@ -219,7 +243,7 @@
       // zo krult de sliert na in plaats van als één plank te kantelen.
       // Stijfheid en demping hangen af van hoe diep een scharnier zit, niet
       // van een vaste lijst: zo werkt het voor drie én voor vijf scharnieren.
-      var DOORGIFTE = 0.86;
+      var DOORGIFTE = 0.90;
 
       var veren = slierten.map(function (el) {
         var delen = Array.prototype.slice.call(el.querySelectorAll(".deel"));
@@ -229,8 +253,8 @@
           delen: delen,
           hoek: delen.map(function () { return 0; }),
           snelheid: delen.map(function () { return 0; }),
-          stijfheid: delen.map(function (_, n) { return 0.075 - 0.043 * (n / laatste); }),
-          demping: delen.map(function (_, n) { return 0.925 + 0.035 * (n / laatste); }),
+          stijfheid: delen.map(function (_, n) { return 0.058 - 0.036 * (n / laatste); }),
+          demping: delen.map(function (_, n) { return 0.938 + 0.034 * (n / laatste); }),
           zwiep: delen.map(function (_, n) { return 4 + 9 * (n / laatste); })
         };
       });
