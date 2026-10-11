@@ -310,8 +310,12 @@ code {
   margin-left: calc(var(--w, 22px) * var(--wf, 1) / -2);
   transform-origin: 50% 0;
   /* --val = de inval bij het laden, --kantel = de scheefstand waarmee hij
-     hangt, zodat ze niet allemaal kaarsrecht naar beneden wijzen. */
-  transform: translateY(var(--val, -102%)) rotate(var(--kantel, 0deg));
+     hangt, --wind = de vlaag die er af en toe doorheen trekt. De wind zit
+     op de sliert als geheel en niet op elk scharnier: dat is één animatie
+     per sliert in plaats van vijf, en een vlaag duwt een sliert nu eenmaal
+     in zijn geheel opzij. */
+  transform: translateY(var(--val, -102%))
+             rotate(calc(var(--kantel, 0deg) + var(--wind, 0deg)));
   will-change: transform;
 }
 
@@ -393,6 +397,12 @@ code {
   initial-value: 0deg;
 }
 
+@property --wind {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 /*
   Rustig slingeren zodra de sliert hangt. De drie delen lopen op dezelfde
   duur maar met een versprongen fase, dus de beweging loopt als een golf
@@ -425,6 +435,29 @@ code {
 @keyframes slingert-b {
   0%, 100% { --zwaai2: var(--slag2, 0deg); }
   50%      { --zwaai2: calc(var(--slag2, 0deg) * -1); }
+}
+
+/*
+  Wind. Het grootste deel van de cyclus gebeurt er niets; dan zwelt er een
+  vlaag op die daarna in een paar slagen uitdooft. JS geeft elke sliert een
+  vertraging die oploopt met zijn plek van links naar rechts, dus de vlaag
+  trekt zichtbaar door de slinger heen.
+
+  Deze regel moet de val-animatie op .sliert kunnen overnemen, vandaar de
+  zwaardere selector: .slinger.is-los .sliert weegt anders zwaarder.
+*/
+.slinger.is-los .sliert.is-neer {
+  animation: windvlaag var(--windduur, 19s) ease-in-out var(--windfase, 0s) infinite;
+}
+
+@keyframes windvlaag {
+  0%, 38%  { --wind: 0deg; }
+  50%      { --wind: var(--vlaag, 5deg); }
+  60%      { --wind: calc(var(--vlaag, 5deg) * 0.42); }
+  70%      { --wind: calc(var(--vlaag, 5deg) * 0.72); }
+  82%      { --wind: calc(var(--vlaag, 5deg) * 0.22); }
+  91%      { --wind: calc(var(--vlaag, 5deg) * 0.36); }
+  100%     { --wind: 0deg; }
 }
 
 
@@ -864,7 +897,7 @@ code {
 
   /* Op een telefoon blijven er zeven over, en smaller: twintig slierten
      verstoppen de wordmark, en honderd delen animeren is zonde van de accu. */
-  .slinger--achter .sliert:not(:nth-of-type(6n + 3)),
+  .slinger--achter .sliert:not(:nth-of-type(9n + 4)),
   .slinger--voor .sliert:not(:nth-of-type(2n + 1)) { display: none; }
 
   .sliert { --wf: 0.68; }

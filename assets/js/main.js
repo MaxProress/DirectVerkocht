@@ -172,6 +172,16 @@
       el.style.setProperty("--tempo2", (tempo * 1.618 + 0.4).toFixed(2) + "s");
       el.style.setProperty("--fase", (-((i * 61) % 13) * 0.41).toFixed(2) + "s");
       el.style.setProperty("--fase2", (-((i * 47) % 17) * 0.33).toFixed(2) + "s");
+
+      // Wind. Twee groepen met een verschillende omlooptijd: meestal trekt
+      // er één vlaag voorbij, af en toe vallen ze samen en is het een harde.
+      var windduur = i % 2 ? 23 : 17;
+      el.style.setProperty("--windduur", windduur + "s");
+      // Hoe verder naar rechts, hoe later de vlaag aankomt: zo waait hij
+      // zichtbaar door de slinger heen in plaats van overal tegelijk.
+      el.style.setProperty("--windfase", (-windduur * 0.22 * (1 - x / 100)).toFixed(2) + "s");
+      el.style.setProperty("--vlaag",
+        ((achter ? 2.4 : 3.6) + ((i * 19) % 5) * 0.45).toFixed(2) + "deg");
       // Niet allemaal tegelijk, maar ook niet keurig van links naar rechts.
       el.style.setProperty("--vertraging", (0.12 + ((i * 29) % 23) * 0.055).toFixed(2) + "s");
       // Niemand hangt kaarsrecht. Achteraan minder scheef: 58 slierten die
@@ -245,7 +255,14 @@
       // van een vaste lijst: zo werkt het voor drie én voor vijf scharnieren.
       var DOORGIFTE = 0.90;
 
-      var veren = slierten.map(function (el) {
+      // Alleen de slierten vooraan reageren op de muis. De achterste laag
+      // is achtergrond: die beweegt op de wind en verder nergens op, en dat
+      // scheelt tientallen veren per frame.
+      var aanraakbaar = slierten.filter(function (el) {
+        return !el.closest(".slinger--achter");
+      });
+
+      var veren = aanraakbaar.map(function (el) {
         var delen = Array.prototype.slice.call(el.querySelectorAll(".deel"));
         var laatste = delen.length - 1;
 
@@ -262,7 +279,7 @@
       var muisX = null, loopt = false;
 
       var meet = function () {
-        return slierten.map(function (el) {
+        return aanraakbaar.map(function (el) {
           var r = el.getBoundingClientRect();
           return r.left + r.width / 2;
         });
