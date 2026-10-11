@@ -103,17 +103,15 @@
 
   /* ------------------------------------------------------------------------
      4. Slinger
-     De slierten vallen bij het openen naar beneden, wiegen daarna rustig,
-     en wijken voor de cursor. Elke sliert heeft een eigen veertje: de
-     cursor zet een doelhoek, de sliert veert ernaartoe en schiet er een
-     beetje overheen. Een klik geeft ze een duw.
+     De slierten vallen bij het openen naar beneden en bewegen daarna
+     vanzelf: elk scharnier wiegt in zijn eigen tempo, en er trekt af en
+     toe een windvlaag doorheen. Ze reageren nergens op — geen cursor,
+     geen klik — dus na de inval doet CSS al het werk.
      ------------------------------------------------------------------------ */
 
   var slingers = Array.prototype.slice.call(document.querySelectorAll(".slinger"));
 
   if (slingers.length) {
-    var hero = document.querySelector(".hero");
-
     // Vaste "toevalsgetallen": elke herlaadbeurt hangt het gordijn er
     // hetzelfde bij, wat bij het bijstellen een stuk prettiger werkt.
     var zaad = 20260110;
@@ -180,14 +178,12 @@
       // Hoe verder naar rechts, hoe later de vlaag aankomt: zo waait hij
       // zichtbaar door de slinger heen in plaats van overal tegelijk.
       el.style.setProperty("--windfase", (-windduur * 0.22 * (1 - x / 100)).toFixed(2) + "s");
-      el.style.setProperty("--vlaag",
-        ((achter ? 2.4 : 3.6) + ((i * 19) % 5) * 0.45).toFixed(2) + "deg");
+      el.style.setProperty("--vlaag", (2.4 + ((i * 19) % 5) * 0.45).toFixed(2) + "deg");
       // Niet allemaal tegelijk, maar ook niet keurig van links naar rechts.
       el.style.setProperty("--vertraging", (0.12 + ((i * 29) % 23) * 0.055).toFixed(2) + "s");
-      // Niemand hangt kaarsrecht. Achteraan minder scheef: 58 slierten die
-      // allemaal uitwaaieren worden stro, geen gordijn.
-      el.style.setProperty("--kantel",
-        (((i * 53) % 7) - 3) * (achter ? 0.35 : 0.8) + "deg");
+      // Niemand hangt kaarsrecht, maar ook niet te scheef: tachtig slierten
+      // die allemaal uitwaaieren worden stro, geen gordijn.
+      el.style.setProperty("--kantel", (((i * 53) % 7) - 3) * 0.35 + "deg");
 
       // De in elkaar hangende delen. Staan hier en niet in de opmaak, want
       // het is puur versiering en het scheelt tientallen keren dezelfde
@@ -201,10 +197,10 @@
         if (n === 1) deel.style.height = (100 / scharnieren).toFixed(2) + "%";
 
         // Dieper = grotere slag en meer achterloop, zodat golf A als een
-        // golf naar de punt toe loopt. De achterste laag beweegt ingetogen:
-        // daar is het de massa die telt, niet de losse sliert.
-        var basis = achter ? 1.5 : 2.6;
-        var groei = achter ? 2.3 : 5.2;
+        // golf naar de punt toe loopt. Voor en achter even ingetogen: het
+        // moet één gordijn zijn, geen twee lagen met een eigen karakter.
+        var basis = 1.5;
+        var groei = 2.3;
         deel.style.setProperty("--slag", (basis + diep * groei).toFixed(2) + "deg");
         deel.style.setProperty("--slag2", (1.3 + diep * 2.9).toFixed(2) + "deg");
 
@@ -247,114 +243,6 @@
           slingers.forEach(function (s) { s.classList.add("is-los"); });
         });
       });
-
-      // Per sliert één veertje per scharnier. Het bovenste volgt de cursor,
-      // de onderste volgen het scharnier erboven met een slag vertraging —
-      // zo krult de sliert na in plaats van als één plank te kantelen.
-      // Stijfheid en demping hangen af van hoe diep een scharnier zit, niet
-      // van een vaste lijst: zo werkt het voor drie én voor vijf scharnieren.
-      var DOORGIFTE = 0.90;
-
-      // Alleen de slierten vooraan reageren op de muis. De achterste laag
-      // is achtergrond: die beweegt op de wind en verder nergens op, en dat
-      // scheelt tientallen veren per frame.
-      var aanraakbaar = slierten.filter(function (el) {
-        return !el.closest(".slinger--achter");
-      });
-
-      var veren = aanraakbaar.map(function (el) {
-        var delen = Array.prototype.slice.call(el.querySelectorAll(".deel"));
-        var laatste = delen.length - 1;
-
-        return {
-          delen: delen,
-          hoek: delen.map(function () { return 0; }),
-          snelheid: delen.map(function () { return 0; }),
-          stijfheid: delen.map(function (_, n) { return 0.058 - 0.036 * (n / laatste); }),
-          demping: delen.map(function (_, n) { return 0.938 + 0.034 * (n / laatste); }),
-          zwiep: delen.map(function (_, n) { return 4 + 9 * (n / laatste); })
-        };
-      });
-
-      var muisX = null, loopt = false;
-
-      var meet = function () {
-        return aanraakbaar.map(function (el) {
-          var r = el.getBoundingClientRect();
-          return r.left + r.width / 2;
-        });
-      };
-
-      var middens = meet();
-      window.addEventListener("resize", function () { middens = meet(); });
-
-      hero.addEventListener("pointermove", function (e) {
-        muisX = e.clientX;
-        start();
-      });
-
-      hero.addEventListener("pointerleave", function () {
-        muisX = null;
-        start();           // nog even doorlopen tot ze weer stilhangen
-      });
-
-      hero.addEventListener("pointerdown", function (e) {
-        var x = e.clientX;
-        veren.forEach(function (v, i) {
-          var afstand = middens[i] - x;
-          var bereik = 300;
-          if (Math.abs(afstand) > bereik) return;
-          var kracht = (1 - Math.abs(afstand) / bereik) * (afstand >= 0 ? 1 : -1);
-          // Het uiteinde krijgt de hardste zwieper.
-          for (var k = 0; k < v.snelheid.length; k++) {
-            v.snelheid[k] += kracht * v.zwiep[k];
-          }
-        });
-        start();
-      });
-
-      function stap() {
-        var rust = true;
-
-        veren.forEach(function (v, i) {
-          var kop = 0;
-
-          if (muisX !== null) {
-            var afstand = middens[i] - muisX;
-            var bereik = 240;
-            if (Math.abs(afstand) <= bereik) {
-              // Dichterbij = verder opzij, en altijd wég van de cursor.
-              var kracht = 1 - Math.abs(afstand) / bereik;
-              kop = (afstand >= 0 ? 1 : -1) * kracht * 8;
-            }
-          }
-
-          for (var n = 0; n < v.hoek.length; n++) {
-            var doel = n === 0 ? kop : v.hoek[n - 1] * DOORGIFTE;
-
-            v.snelheid[n] += (doel - v.hoek[n]) * v.stijfheid[n];
-            v.snelheid[n] *= v.demping[n];
-            v.hoek[n] += v.snelheid[n];
-
-            if (Math.abs(v.snelheid[n]) > 0.01 || Math.abs(v.hoek[n] - doel) > 0.01) {
-              rust = false;
-            }
-
-            v.delen[n].style.setProperty("--duw", v.hoek[n].toFixed(2) + "deg");
-          }
-        });
-
-        // Stoppen zodra alles stilhangt, ook als de muis nog op de hero
-        // staat: elke nieuwe beweging start de lus toch weer.
-        if (rust) { loopt = false; return; }
-        requestAnimationFrame(stap);
-      }
-
-      function start() {
-        if (loopt) return;
-        loopt = true;
-        requestAnimationFrame(stap);
-      }
     }
   }
 
