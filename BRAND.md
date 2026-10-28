@@ -52,3 +52,25 @@ Plus drie texturen in `assets/img/textures/`:
 | 10 | barcode geel | 22 | euroteken roze |
 | 11 | panterprint verfvlek | 23 | euroteken rood |
 | 12 | panterprint strook | – | krant: gescheurde krantensnipper |
+
+## Foto's (`assets/img/foto/`)
+
+Uit de shoot, teruggebracht tot webp (samen ~0,6 MB).
+
+| Bestand | Waar |
+| --- | --- |
+| `duo.webp` | de grote foto bij "Dat zijn wij" |
+| `selfie.webp`, `boven.webp` | kiekjes in de hero |
+| `sokkel.webp`, `kar.webp` | kiekjes bij de video |
+| `zit.webp` | kiekje bij "Dat zijn wij" |
+| `bril.webp` | kiekje bij contact |
+| `knip-hotdog.webp` | vrijstaand geknipt, rechtsonder in de hero |
+
+Een kiekje is een `<figure class="snap">` in de deco-laag van een sectie: witte
+rand, plakband, harde slagschaduw, en met `data-drift` drijft het mee met de
+scroll. De positie staat per modifier in de CSS (`.snap--hero-l` enzovoort).
+
+Het knipsel is met de hand vrijgemaakt: de witte studio-achtergrond is vanaf de
+randen weggevuld en de rand is twee keer zacht gemaakt. Foto's met
+bewegingsonscherpte of een klatergoud-achtergrond laten zich zo niet knippen —
+die staan als kiekje op de pagina.

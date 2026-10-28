@@ -13,12 +13,13 @@
      ------------------------------------------------------------------------ */
 
   var teOnthullen = document.querySelectorAll(
-    ".cluster, .tape, .videoframe, .photo, .duo-text, .contact__title, .contact__sub, .bigbutton, .socials"
+    ".cluster, .snap, .knipsel, .tape, .videoframe, .photo, .duo-text,\n     .contact__title, .contact__sub, .bigbutton, .socials"
   );
 
   teOnthullen.forEach(function (el) {
-    // Clusters hebben hun eigen reveal-overgang; de rest leent .reveal.
-    if (!el.classList.contains("cluster")) el.classList.add("reveal");
+    // Clusters, kiekjes en het knipsel hebben hun eigen reveal-overgang
+    // (ze moeten hun rotatie en drift houden); de rest leent .reveal.
+    if (!el.matches(".cluster, .snap, .knipsel")) el.classList.add("reveal");
   });
 
   // Elk stukje binnen een cluster wiegt in zijn eigen tempo, anders beweegt
@@ -48,7 +49,7 @@
      2. Collage-elementen laten meedrijven met de scroll
      ------------------------------------------------------------------------ */
 
-  var drijvers = Array.prototype.slice.call(document.querySelectorAll(".cluster[data-drift]"));
+  var drijvers = Array.prototype.slice.call(document.querySelectorAll("[data-drift]"));
   var wachtOpFrame = false;
 
   function verplaatsDeco() {
@@ -280,26 +281,7 @@
 
 
   /* ------------------------------------------------------------------------
-     5. Foto: placeholder tonen zolang duo.jpg er nog niet is
-     ------------------------------------------------------------------------ */
-
-  var foto = document.querySelector(".photo");
-
-  if (foto) {
-    var afbeelding = foto.querySelector("img");
-
-    var markeerLeeg = function () { foto.classList.add("is-empty"); };
-
-    if (afbeelding.complete) {
-      if (!afbeelding.naturalWidth) markeerLeeg();
-    } else {
-      afbeelding.addEventListener("error", markeerLeeg);
-    }
-  }
-
-
-  /* ------------------------------------------------------------------------
-     6. Jaartal in de footer
+     5. Jaartal in de footer
      ------------------------------------------------------------------------ */
 
   var jaar = document.getElementById("jaar");

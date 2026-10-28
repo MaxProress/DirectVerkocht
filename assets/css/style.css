@@ -43,7 +43,17 @@ html {
 
 body {
   margin: 0;
-  background: var(--creme);
+  /* Kleurwaas over de volle paginahoogte: roze bovenin, geel in het midden,
+     blauw onderin. De radialen staan op percentages van het hele document,
+     dus de overgang loopt mee met de lengte van de pagina. */
+  background:
+    radial-gradient(60% 28% at 6% 2%,   rgba(255, 60, 166, 0.26), transparent 70%),
+    radial-gradient(55% 24% at 97% 22%, rgba(23, 105, 255, 0.20), transparent 70%),
+    radial-gradient(70% 26% at 12% 54%, rgba(255, 236, 0, 0.34),  transparent 72%),
+    radial-gradient(55% 22% at 94% 74%, rgba(255, 49, 49, 0.20),  transparent 70%),
+    radial-gradient(80% 30% at 50% 100%, rgba(23, 105, 255, 0.22), transparent 72%),
+    linear-gradient(180deg, #fffaf1, var(--creme) 45%, #f2e8d6);
+  background-repeat: no-repeat;
   color: var(--zwart);
   font-family: var(--body);
   font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
@@ -808,34 +818,6 @@ code {
   box-shadow: 12px 14px 0 var(--zwart);
 }
 
-.photo__placeholder {
-  position: absolute;
-  inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  text-align: center;
-  padding: 1.5rem;
-  background: repeating-linear-gradient(
-    45deg, #ece4d6, #ece4d6 14px, #e4dbca 14px, #e4dbca 28px
-  );
-  box-shadow: 12px 14px 0 var(--zwart);
-}
-
-/* JS zet .is-empty als assets/img/duo.jpg nog niet bestaat. */
-.photo.is-empty .photo__placeholder { display: flex; }
-.photo.is-empty .photo__img { visibility: hidden; }
-
-.photo__placeholder strong {
-  font-family: var(--display);
-  font-size: clamp(1.1rem, 0.9rem + 1vw, 1.6rem);
-  text-transform: uppercase;
-}
-
-.photo__placeholder span { font-size: 0.85rem; opacity: 0.7; }
-
 .photo__star {
   position: absolute;
   width: 110px;
@@ -858,6 +840,86 @@ code {
   color: var(--rood);
   margin-top: 1.8rem;
 }
+
+
+/* --------------------------------------------------------------------------
+   Foto's door de pagina
+   -------------------------------------------------------------------------- */
+
+/* Een kiekje: witte rand, harde slagschaduw, scheef opgeplakt. Ze hangen in
+   de deco-laag, dus ze drijven mee met de scroll net als de collage. */
+.snap {
+  position: absolute;
+  z-index: 2;
+  width: var(--sw, 200px);
+  margin: 0;
+  padding: 7px 7px 2px;
+  background: #fffdf6;
+  rotate: var(--rot, -4deg);
+  box-shadow: 9px 11px 0 rgba(17, 17, 17, 0.88);
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.snap.is-in {
+  opacity: 1;
+  transform: translate3d(0, var(--drift-y, 0px), 0);
+}
+
+.snap img {
+  width: 100%;
+  aspect-ratio: var(--ar, 4 / 3);
+  object-fit: cover;
+  background: #e4ddd0;
+}
+
+.snap figcaption {
+  font-family: var(--marker);
+  font-size: clamp(0.72rem, 0.6rem + 0.4vw, 0.95rem);
+  line-height: 1.9;
+  text-align: center;
+  color: var(--zwart);
+}
+
+/* Een stukje plakband op de bovenhoek. */
+.snap::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 62px;
+  height: 22px;
+  translate: -50% 0;
+  rotate: var(--taperot, -7deg);
+  background: rgba(255, 236, 0, 0.78);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.12);
+}
+
+.snap--hero-l   { --sw: clamp(120px, 15vw, 210px); --rot: -6deg;  left: 5%;  bottom: 9%; }
+.snap--hero-r   { --sw: clamp(105px, 12vw, 165px); --rot: 7deg;   right: 9%; bottom: 35%; --ar: 3 / 4; }
+.snap--show-l   { --sw: clamp(120px, 14vw, 195px); --rot: 5deg;   left: 3%;  top: 16%; --ar: 3 / 4; }
+.snap--show-r   { --sw: clamp(120px, 15vw, 205px); --rot: -8deg;  right: 2%; bottom: 8%; }
+/* Hangt met opzet over de onderhoek van de grote foto heen. */
+.snap--duo-l    { --sw: clamp(110px, 13vw, 180px); --rot: 8deg;   left: 3%;  bottom: 3%; z-index: 3; }
+.snap--contact  { --sw: clamp(120px, 15vw, 200px); --rot: -7deg;  left: 6%;  top: 14%; --ar: 3 / 4; }
+
+/* Vrijstaand geknipt: geen lijst, alleen wij. */
+.knipsel {
+  position: absolute;
+  z-index: 5;
+  width: clamp(230px, 32vw, 470px);
+  right: -3%;
+  bottom: -1%;
+  rotate: 2deg;
+  pointer-events: none;
+  filter: drop-shadow(10px 12px 0 rgba(17, 17, 17, 0.22));
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  transition: opacity 1s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.knipsel.is-in { opacity: 1; transform: none; }
 
 
 /* --------------------------------------------------------------------------
@@ -894,6 +956,7 @@ code {
   /* Clusters die bij één kolom tekst in de weg gaan zitten. */
   .cluster--duo-br,
   .cluster--show-tr { display: none; }
+
 }
 
 
@@ -938,6 +1001,21 @@ code {
   .photo__star { width: 74px; top: -28px; right: -16px; }
 
   .footer { justify-content: center; text-align: center; }
+
+  /* Op een telefoon blijft er per sectie één kiekje over, anders ligt de
+     tekst eronder. */
+  .snap--hero-r,
+  .snap--show-l,
+  .snap--duo-l { display: none; }
+
+  .snap { --sw: 104px; box-shadow: 6px 7px 0 rgba(17, 17, 17, 0.88); }
+  .snap::before { width: 44px; height: 16px; top: -8px; }
+
+  .snap--hero-l  { left: 3%;  bottom: 6%; }
+  .snap--show-r  { right: -2%; bottom: 4%; }
+  .snap--contact { left: -2%; top: 8%; }
+
+  .knipsel { width: 190px; right: -6%; bottom: 0; }
 }
 
 
@@ -954,6 +1032,6 @@ code {
     transition-duration: 0.001ms !important;
   }
 
-  .cluster, .reveal { opacity: 1; transform: none; }
+  .cluster, .reveal, .snap, .knipsel { opacity: 1; transform: none; }
   .ticker__track { animation: none; }
 }
