@@ -211,30 +211,43 @@ code {
   gap: 1.8rem;
 }
 
-.wordmark {
-  margin: 0;
-  font-family: var(--display);
-  font-weight: 400;
-  line-height: 0.82;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  font-size: clamp(3.6rem, 15vw, 11rem);
-  display: grid;
+.wordmark { margin: 0; }
+
+.wordmark__logo {
+  display: block;
+  width: min(88vw, 980px);
+  height: auto;
+  fill: var(--zwart);
+  /* De slierten hangen eroverheen; dit vangt zelf geen klikken, maar de
+     losse letters moeten wel hover kunnen krijgen. */
+  pointer-events: auto;
 }
 
-.wordmark__line { display: block; }
-.wordmark__line--1 { rotate: -2.5deg; }
-.wordmark__line--2 { rotate: 1.5deg; margin-top: -0.04em; }
-
-/* Elke letter krijgt in JS een eigen span zodat ze los kunnen wiebelen. */
+/* Elke letter is een eigen pad uit de vectorisatie, dus ze kunnen los
+   reageren. fill-box zet het draaipunt in het midden van de letter zelf;
+   zonder dat draait hij om de oorsprong van de hele tekening. */
 .wordmark .ltr {
-  display: inline-block;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.25s ease;
 }
 
 .wordmark .ltr:hover {
-  transform: translateY(-0.07em) rotate(-6deg) scale(1.06);
-  color: var(--roze);
+  transform: translateY(-5%) rotate(-5deg) scale(1.06);
+  fill: var(--roze);
+}
+
+/* Zichtbaar voor schermlezers, onzichtbaar op het scherm. */
+.alleen-voorlezen {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .scroll-hint {

@@ -9,29 +9,7 @@
   var stilleVoorkeur = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   /* ------------------------------------------------------------------------
-     1. Wordmark: elke letter los, zodat hij per letter kan wiebelen bij hover
-     ------------------------------------------------------------------------ */
-
-  document.querySelectorAll(".wordmark__line").forEach(function (regel) {
-    var tekst = regel.textContent.trim();
-    regel.textContent = "";
-
-    Array.prototype.forEach.call(tekst, function (teken, i) {
-      var span = document.createElement("span");
-      span.className = "ltr";
-      span.textContent = teken;
-      // Kleine willekeurige starthoek, zodat het handgezet aanvoelt.
-      span.style.transform = "rotate(" + (((i * 37) % 5) - 2) * 0.6 + "deg)";
-      regel.appendChild(span);
-    });
-
-    // Schermlezers krijgen de hele regel, niet 24 losse letters.
-    regel.setAttribute("aria-label", tekst);
-  });
-
-
-  /* ------------------------------------------------------------------------
-     2. Reveal bij scrollen
+     1. Reveal bij scrollen
      ------------------------------------------------------------------------ */
 
   var teOnthullen = document.querySelectorAll(
@@ -67,7 +45,7 @@
 
 
   /* ------------------------------------------------------------------------
-     3. Collage-elementen laten meedrijven met de scroll
+     2. Collage-elementen laten meedrijven met de scroll
      ------------------------------------------------------------------------ */
 
   var drijvers = Array.prototype.slice.call(document.querySelectorAll(".cluster[data-drift]"));
@@ -102,7 +80,7 @@
 
 
   /* ------------------------------------------------------------------------
-     4. Slinger
+     3. Slinger
      De slierten vallen bij het openen naar beneden en bewegen daarna
      vanzelf: elk scharnier wiegt in zijn eigen tempo, en er trekt af en
      toe een windvlaag doorheen. Ze reageren nergens op — geen cursor,
@@ -248,7 +226,7 @@
 
 
   /* ------------------------------------------------------------------------
-     5. Video: iframe pas laden na een klik, zodat de pagina snel blijft
+     4. Video: iframe pas laden na een klik, zodat de pagina snel blijft
      ------------------------------------------------------------------------ */
 
   var frame = document.querySelector(".videoframe");
@@ -302,7 +280,7 @@
 
 
   /* ------------------------------------------------------------------------
-     6. Foto: placeholder tonen zolang duo.jpg er nog niet is
+     5. Foto: placeholder tonen zolang duo.jpg er nog niet is
      ------------------------------------------------------------------------ */
 
   var foto = document.querySelector(".photo");
@@ -321,7 +299,7 @@
 
 
   /* ------------------------------------------------------------------------
-     7. Jaartal in de footer
+     6. Jaartal in de footer
      ------------------------------------------------------------------------ */
 
   var jaar = document.getElementById("jaar");
